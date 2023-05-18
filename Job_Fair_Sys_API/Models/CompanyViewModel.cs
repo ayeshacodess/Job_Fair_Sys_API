@@ -13,11 +13,11 @@ namespace Job_Fair_Sys_API.Models
         public int? noOfInterviewers { get; set; }
         public string contact1 { get; set; }
         public string contact2 { get; set; }
-        public string timeSlot { get; set; }
+        public int timeSlot { get; set; }
         public string profile { get; set; }
         public string status { get; set; }
 
-        public List<int> skill_Ids { get; set; }
+        public List<CompanySkillViewModel> skills { get; set; }
 
         public Company ToEntity()
         {
@@ -47,16 +47,25 @@ namespace Job_Fair_Sys_API.Models
                 noOfInterviewers = company.NoOfInterviewers,
                 contact1 = company.Contact1,
                 contact2 = company.Contact2,
-                timeSlot = company.TimeSlot,
+                timeSlot = company.TimeSlot ?? 0,
                 profile = company.Profile,
                 status = company.Status,
                 
  
-                skill_Ids = company.CompanyRequiredSkills.Select(x => x.Skill_Id).ToList()
+                skills = company.CompanyRequiredSkills.Select(x => new CompanySkillViewModel{
+                    id = x.Skill_Id,
+                    technology = x.Skill?.Technology
+                }).ToList()
             };
 
             return model;
         }
 
+    }
+
+    public class CompanySkillViewModel
+    {
+        public int id { get; set; }
+        public string technology { get; set; }
     }
 }

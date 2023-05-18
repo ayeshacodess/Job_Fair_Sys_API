@@ -50,50 +50,51 @@ namespace Job_Fair_Sys_API.Controllers
         public async System.Threading.Tasks.Task<HttpResponseMessage> AddCompanyAsync()
         {
             var httpRequest = HttpContext.Current.Request;
-            var body = await Request.Content.ReadAsStringAsync();
-            using (var reader = new StreamReader(body) )
+
+            using (var reader = new StreamReader(await Request.Content.ReadAsStreamAsync()))
             {
-                string requestBody = reader.ReadToEnd();
-                var reqData = JsonConvert.DeserializeObject<CompanyViewModel>(requestBody);
-                // Do something with the request body
+                try
+                {
+                    string requestBody = reader.ReadToEnd();
+
+                    var company = JsonConvert.DeserializeObject<CompanyViewModel>(requestBody);
+
+                    var entity = new Company
+                    {
+                        Id = company.id,
+                        Name = company.name,
+                        Contact1 = company.contact1,
+                        Contact2 = company.contact2,
+                        TimeSlot = company.timeSlot,
+                        NoOfInterviewers = company.noOfInterviewers,
+                        Status = "Pending"
+                    };
+
+                    //_companyRespository.Add(entity);
+
+                    var skills = _companyRespository.DbContext.Skills.ToList();
+                    foreach (var skl in company.skills)
+                    {
+                        var skill = skills.FirstOrDefault(x => x.Id == skl.id); // will retun skill id nd tech
+
+                        var newRequiredSkill = new CompanyRequiredSkill
+                        {
+                            NoOfInterviewers = 0,
+                            Skill = skill
+                        };
+
+                        entity.CompanyRequiredSkills.Add(newRequiredSkill);
+                    }
+
+                    _companyRespository.Add(entity);
+
+                    return Request.CreateResponse(HttpStatusCode.OK, company);
+                }
+                catch (Exception ex)
+                {
+                    return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+                }
             }
-            return Request.CreateResponse(HttpStatusCode.OK);
-            //try     
-            //{
-            //    if (company == null) return Request.CreateResponse(HttpStatusCode.NotAcceptable);
-
-            //    var entity = company.ToEntity();
-            //    //var entity = new Company();
-            //    //entity.id = company.id;
-            //    //entity.userId = company.userId;
-            //    //entity.name = company.name;
-            //    //entity.allotedRoom = company.allotedRoom;
-            //    //entity.startTime = company.startTime;
-            //    //entity.endTime = company.endTime;
-            //    //_companyRespository.Add(entity);
-
-            //    var skills = _companyRespository.DbContext.Skills.ToList();
-            //    foreach (var skilliD in company.skill_Ids)
-            //    {
-            //        var skill = skills.FirstOrDefault(x => x.id == skilliD); // will retun skill id nd tech
-
-            //        var newRequiredSkill = new CompanyRequiredSkill
-            //        {
-            //            noOfInterviewers = 0,
-            //            Skill = skill
-            //        };
-
-            //        entity.CompanyRequiredSkills.Add(newRequiredSkill);
-            //    }
-
-            //     _companyRespository.Add(entity);
-
-            //    return Request.CreateResponse(HttpStatusCode.OK, company);
-            //}
-            //catch (Exception ex)
-            //{
-            //    return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
-            //}
         }
 
         [HttpPost]
@@ -125,9 +126,9 @@ namespace Job_Fair_Sys_API.Controllers
                 }
                 var skills = _companyRespository.DbContext.Skills.ToList();
                 
-                foreach (var skilliD in company.skill_Ids)
+                foreach (var skl in company.skills)
                 {
-                    var skill = skills.FirstOrDefault(x => x.Id == skilliD);
+                    var skill = skills.FirstOrDefault(x => x.Id == skl.id);
 
                     var newRequiredSkill = new CompanyRequiredSkill
                     {

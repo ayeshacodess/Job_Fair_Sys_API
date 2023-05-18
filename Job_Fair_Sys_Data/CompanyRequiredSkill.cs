@@ -14,6 +14,7 @@ namespace Job_Fair_Sys_Data
     
     public partial class CompanyRequiredSkill
     {
+        public int Id { get; set; }
         public int CompanyId { get; set; }
         public int Skill_Id { get; set; }
         public Nullable<int> NoOfInterviewers { get; set; }
