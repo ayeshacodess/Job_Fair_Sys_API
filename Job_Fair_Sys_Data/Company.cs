@@ -32,10 +32,10 @@ namespace Job_Fair_Sys_Data
         public string Profile { get; set; }
         public string Status { get; set; }
     
-        public virtual User User { get; set; }
         public virtual ICollection<CompanyRequiredSkill> CompanyRequiredSkills { get; set; }
         public virtual ICollection<EventFeedback> EventFeedbacks { get; set; }
         public virtual ICollection<InterviewSchedule> InterviewSchedules { get; set; }
         public virtual ICollection<StudentsFeedback> StudentsFeedbacks { get; set; }
+        public virtual User User { get; set; }
     }
 }

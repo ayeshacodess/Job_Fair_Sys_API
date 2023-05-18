@@ -96,6 +96,9 @@
     <Compile Include="Student.cs">
       <DependentUpon>DbModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="StudentSelectedCompany.cs">
+      <DependentUpon>DbModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="StudentsFeedback.cs">
       <DependentUpon>DbModel.tt</DependentUpon>
     </Compile>

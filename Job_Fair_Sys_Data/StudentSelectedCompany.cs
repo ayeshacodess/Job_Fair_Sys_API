@@ -12,14 +12,13 @@ namespace Job_Fair_Sys_Data
     using System;
     using System.Collections.Generic;
     
-    public partial class StudentSkill
+    public partial class StudentSelectedCompany
     {
-        public int Id { get; set; }
-        public int StudentId { get; set; }
-        public int Skill_Id { get; set; }
-        public int Level_Id { get; set; }
+        public int id { get; set; }
+        public Nullable<int> Company_Id { get; set; }
+        public Nullable<int> Student_Id { get; set; }
+        public Nullable<bool> DummyColumn { get; set; }
     
-        public virtual Skill Skill { get; set; }
         public virtual Student Student { get; set; }
     }
 }

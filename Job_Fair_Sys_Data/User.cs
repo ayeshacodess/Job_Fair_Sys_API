@@ -25,7 +25,6 @@ namespace Job_Fair_Sys_Data
         public string Username { get; set; }
         public string Password { get; set; }
         public string Role { get; set; }
-        public string Email { get; set; }
     
         public virtual ICollection<Company> Companies { get; set; }
         public virtual ICollection<SocietyMember> SocietyMembers { get; set; }

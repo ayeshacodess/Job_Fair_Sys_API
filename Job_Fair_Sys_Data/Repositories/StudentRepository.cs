@@ -14,13 +14,18 @@ namespace Job_Fair_Sys_Data.Repositories
 
         public List<Student> GetStudents()
         {
-            var students = _dbContext.Students.ToList();
+            var students = _dbContext.Students.Where(x => x.IsCVUploaded == true).ToList();
             return students;
         }
 
         public Student GetStudent(int id)
         {
             var student = _dbContext.Students.Find(id);
+            return student;
+        }
+        public Student GetStudentByAridNo(string aridNo)
+        {
+            var student = _dbContext.Students.FirstOrDefault(x => x.AridNumber == aridNo);
             return student;
         }
 

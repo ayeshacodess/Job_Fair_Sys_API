@@ -17,8 +17,9 @@ namespace Job_Fair_Sys_Data
         public Student()
         {
             this.InterviewSchedules = new HashSet<InterviewSchedule>();
-            this.StudentSkills = new HashSet<StudentSkill>();
             this.StudentsFeedbacks = new HashSet<StudentsFeedback>();
+            this.StudentSelectedCompanies = new HashSet<StudentSelectedCompany>();
+            this.StudentSkills = new HashSet<StudentSkill>();
         }
     
         public int Id { get; set; }
@@ -38,8 +39,9 @@ namespace Job_Fair_Sys_Data
         public Nullable<bool> IsCVUploaded { get; set; }
     
         public virtual ICollection<InterviewSchedule> InterviewSchedules { get; set; }
-        public virtual ICollection<StudentSkill> StudentSkills { get; set; }
-        public virtual User User { get; set; }
         public virtual ICollection<StudentsFeedback> StudentsFeedbacks { get; set; }
+        public virtual User User { get; set; }
+        public virtual ICollection<StudentSelectedCompany> StudentSelectedCompanies { get; set; }
+        public virtual ICollection<StudentSkill> StudentSkills { get; set; }
     }
 }

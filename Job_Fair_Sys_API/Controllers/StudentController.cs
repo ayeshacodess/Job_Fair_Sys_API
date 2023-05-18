@@ -46,7 +46,7 @@ namespace Job_Fair_Sys_API.Controllers
         {
             try
             {
-                var students = _studentRepository.GetStudents();
+                var students = _studentRepository.GetStudents().Take(100).ToList();
                 var studentModels = new List<StudentViewModel>();
                 foreach (var item in students)
                 {
@@ -85,37 +85,85 @@ namespace Job_Fair_Sys_API.Controllers
         public async Task<HttpResponseMessage>  UpLoadCV()
         {
             var httpRequest = HttpContext.Current.Request;
-            //var body = await Request.Content.ReadAsStringAsync();
+
             using (var reader = new StreamReader(await Request.Content.ReadAsStreamAsync()))
             {
-                string requestBody = reader.ReadToEnd();
-
-                var reqData = JsonConvert.DeserializeObject<StudentViewModel>(requestBody);
-
-                // Do something with the request body
-            }
-
-            HttpResponseMessage result = null;
-            
-            if (httpRequest.Files.Count > 0)
-            {
-                var docfiles = new List<string>();
-                foreach (string file in httpRequest.Files)
+                try
                 {
-                    var postedFile = httpRequest.Files[file];
-                    var filePath = HttpContext.Current.Server.MapPath("~/" + postedFile.FileName);
-                    postedFile.SaveAs(filePath);
-                    docfiles.Add(filePath);
+                    string requestBody = reader.ReadToEnd();
+
+                    var reqData = JsonConvert.DeserializeObject<StudentViewModel>(requestBody);
+
+                     var dbStd = _studentRepository.GetStudentByAridNo(reqData.aridNumber);
+
+                    if(dbStd != null)
+                    {
+                        dbStd.StudyStatus = reqData.studyStatus;
+                        dbStd.Contact1 = reqData.contact1;
+                        dbStd.Contact2 = reqData.contact2;
+                        dbStd.FypGrad = reqData.FypGrad;
+                        dbStd.FypTech = reqData.FypTech;
+                        dbStd.FypTitle = reqData.FypTitle;
+                        dbStd.HasFYP = reqData.hasFYP;
+                        dbStd.IsCVUploaded = true;
+
+                        var removedSkills = dbStd.StudentSkills.ToList();
+                        foreach (var s in removedSkills)
+                        {
+                            dbStd.StudentSkills.Remove(s);
+                        }
+
+                        var skills = _studentRepository.DbContext.Skills.ToList();
+
+                        foreach (var skill in reqData.studentSkills)
+                        {
+                            var skl = skills.FirstOrDefault(x => x.Id == skill.skill_Id);
+
+                            var newRequiredSkill = new StudentSkill
+                            {
+                                Level_Id = skill.level_Id,
+                                Skill = skl
+                            };
+
+                            dbStd.StudentSkills.Add(newRequiredSkill);
+                        }
+
+                        _studentRepository.DbContext.Entry(dbStd).CurrentValues.SetValues(dbStd);
+                        _studentRepository.SaveChanges();
+
+                        return Request.CreateResponse(HttpStatusCode.OK, dbStd);
+                    }
+
                 }
-                result = Request.CreateResponse(HttpStatusCode.Created, docfiles);
+                catch (Exception ex)
+                {
+                    return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.InnerException.ToString());
+                }
+
+                return Request.CreateResponse(HttpStatusCode.NotFound, "No record found.");
+            }
+
+            //HttpResponseMessage result = null;
+            
+            //if (httpRequest.Files.Count > 0)
+            //{
+            //    var docfiles = new List<string>();
+            //    foreach (string file in httpRequest.Files)
+            //    {
+            //        var postedFile = httpRequest.Files[file];
+            //        var filePath = HttpContext.Current.Server.MapPath("~/" + postedFile.FileName);
+            //        postedFile.SaveAs(filePath);
+            //        docfiles.Add(filePath);
+            //    }
+            //    result = Request.CreateResponse(HttpStatusCode.Created, docfiles);
 
 
-            }
-            else
-            {
-                result = Request.CreateResponse(HttpStatusCode.BadRequest);
-            }
-            return result;
+            //}
+            //else
+            //{
+            //    result = Request.CreateResponse(HttpStatusCode.BadRequest);
+            //}
+            //return result;
         }
     }
 }

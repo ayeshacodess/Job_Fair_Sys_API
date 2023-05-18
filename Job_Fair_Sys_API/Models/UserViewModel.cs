@@ -18,7 +18,6 @@ namespace Job_Fair_Sys_API.Models
             var model = new UserViewModel
             {
                 Id = user.Id,
-                email = user.Email,
                 role = user.Role,
                 username = user.Username,
             };

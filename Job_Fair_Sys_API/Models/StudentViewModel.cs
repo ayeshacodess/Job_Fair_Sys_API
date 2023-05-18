@@ -24,7 +24,7 @@ namespace Job_Fair_Sys_API.Models
         public string FypGrad { get; set; }
         public Nullable<bool> IsCVUploaded { get; set; }
 
-        public List<StudentSkill> studentSkills { get; set; }
+        public List<StudentSkillViewModel> studentSkills { get; set; }
 
         public Student ToEntity()
         {
@@ -67,19 +67,18 @@ namespace Job_Fair_Sys_API.Models
                 FypGrad = student.FypGrad,
                 FypTech = student.FypTech,
                 FypTitle = student.FypTitle,
-                studentSkills = student.StudentSkills.Select(x => 
-                    new StudentSkill 
-                    { 
-                        skill_Id = x.Skill_Id, 
-                        level_Id = 1
-                    }).ToList()
+                studentSkills = student.StudentSkills.Select(x => new StudentSkillViewModel
+                { 
+                    skill_Id = x.Skill_Id, 
+                    level_Id = 1
+                }).ToList()
             };
 
             return model;
         }
     }
 
-    public class StudentSkill
+    public class StudentSkillViewModel
     {
         public int skill_Id { get; set; }
         public int level_Id { get; set; }
