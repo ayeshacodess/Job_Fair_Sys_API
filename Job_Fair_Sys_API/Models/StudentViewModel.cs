@@ -28,7 +28,7 @@ namespace Job_Fair_Sys_API.Models
 
         public Student ToEntity()
         {
-            var entity = new Student
+            var student = new Student
             {
                 Id = this.id,
                 UserId = this.userId,
@@ -47,7 +47,7 @@ namespace Job_Fair_Sys_API.Models
                 IsCVUploaded = this.IsCVUploaded
             };
 
-            return entity;
+            return student;
         }
 
         public static StudentViewModel ToViewModel(Student student)

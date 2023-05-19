@@ -17,11 +17,9 @@
         <AssociationConnector Association="DbModel.FK_InterviewSchedule_SocietyMember" />
         <AssociationConnector Association="DbModel.FK_InterviewSchedule_Student" />
         <AssociationConnector Association="DbModel.FK_StudentsFeedback_Student" />
-        <EntityTypeShape EntityType="DbModel.StudentSelectedCompany" Width="1.5" PointX="5.25" PointY="7.25" />
         <EntityTypeShape EntityType="DbModel.User" Width="1.5" PointX="0.75" PointY="11.125" />
         <AssociationConnector Association="DbModel.FK_SocietyMember_User" />
         <AssociationConnector Association="DbModel.FK_Student_User" />
-        <AssociationConnector Association="DbModel.FK_StudentSelectedCompanies_Student" />
         <EntityTypeShape EntityType="DbModel.StudentSkill" Width="1.5" PointX="8.25" PointY="8.875" />
         <AssociationConnector Association="DbModel.FK_CompanyStudentSkill_Skill" />
         <AssociationConnector Association="DbModel.FK_CompanyStudentSkill_Student" />
@@ -33,6 +31,8 @@
         <EntityTypeShape EntityType="DbModel.CompanyRequiredSkill" Width="1.5" PointX="5.25" PointY="10.125" />
         <AssociationConnector Association="DbModel.FK_CompanyRequiredSkill_Company" />
         <AssociationConnector Association="DbModel.FK_CompanyRequiredSkill_Skill" />
+        <EntityTypeShape EntityType="DbModel.StudentSelectedCompany" Width="1.5" PointX="5.25" PointY="7.25" />
+        <AssociationConnector Association="DbModel.FK_StudentSelectedCompanies_Student" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

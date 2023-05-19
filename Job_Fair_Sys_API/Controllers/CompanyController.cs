@@ -16,27 +16,21 @@ namespace Job_Fair_Sys_API.Controllers
     public class CompanyController : ApiController
     {
         private readonly CompanyRepository _companyRespository;
+        private readonly StudentSelectedCompanyRepository _studentSelectedCompanyRepository;
 
         public CompanyController()
         {
+            _studentSelectedCompanyRepository = new StudentSelectedCompanyRepository();
             _companyRespository = new CompanyRepository();
         }
 
         [HttpGet]
         [Route("api/companies")]
-        public HttpResponseMessage Get()
+        public HttpResponseMessage Get(string role, int userId)
         {
             try
             {
-                var companies = _companyRespository.GetCompanies();
-                List<CompanyViewModel> models = new List<CompanyViewModel>();
-
-                foreach (var item in companies)
-                {
-                    var ViewModelTypeCompany = CompanyViewModel.ToViewModel(item); //convert a company into CompanyViewModel type
-                    models.Add(ViewModelTypeCompany);
-                }
-
+                var models = role == "Student" ? GetCompaniesForStudent(userId) : GetCompaniesDataByRole(role);
                 return Request.CreateResponse(HttpStatusCode.OK, models);
             }
             catch (Exception ex)
@@ -79,7 +73,7 @@ namespace Job_Fair_Sys_API.Controllers
 
                         var newRequiredSkill = new CompanyRequiredSkill
                         {
-                            NoOfInterviewers = 0,
+                            NoOfInterviewers = 0, // y zero ? 2 attributes q liye hen
                             Skill = skill
                         };
 
@@ -148,6 +142,90 @@ namespace Job_Fair_Sys_API.Controllers
             {
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
+        }
+
+        [HttpGet]
+        [Route("api/company/status")]
+        public HttpResponseMessage SetAcceptRejectStatus(string status, int companyId)
+        {
+            var company = _companyRespository.GetCompany(companyId);
+
+            if (company == null) 
+                return Request.CreateResponse(HttpStatusCode.NotFound);
+
+            company.Status = status;
+            _companyRespository.DbContext.Entry(company).CurrentValues.SetValues(company);
+            _companyRespository.SaveChanges();
+
+            var updatedCompanies = GetCompaniesDataByRole("Admin");
+
+            return Request.CreateResponse(HttpStatusCode.OK, updatedCompanies);
+        }
+
+        [HttpGet]
+        [Route("api/company/studentapply")]
+        public HttpResponseMessage StudentSelectUnselectCompany(int companyId,  int studentId)
+        {
+           
+            var company = _studentSelectedCompanyRepository.GetStudentSelectedCompany(studentId, companyId);
+
+            if (company == null)
+            {
+                var studentSelectedCompany = new StudentSelectedCompany
+                {
+                    Student_Id = studentId,
+                    Company_Id = companyId
+                };
+
+                _studentSelectedCompanyRepository.Add(studentSelectedCompany);
+            }
+            else 
+            {
+                _studentSelectedCompanyRepository.Remove(company);
+            }
+
+            var acceptedCompanies = GetCompaniesForStudent(studentId);
+
+            return Request.CreateResponse(HttpStatusCode.OK, acceptedCompanies);
+        }
+
+        private List<CompanyViewModel> GetCompaniesDataByRole(string role)
+        {
+            var companies = _companyRespository.GetCompanies();
+            if (role == "Student")
+            {
+                companies = companies.Where(c => c.Status == "Accept").ToList();
+            }
+
+            var models = new List<CompanyViewModel>();
+
+            foreach (var item in companies)
+            {
+                var ViewModelTypeCompany = CompanyViewModel.ToViewModel(item); //convert a company into CompanyViewModel type
+                models.Add(ViewModelTypeCompany);
+            }
+
+            return models;
+        }
+
+        private List<CompanyViewModel> GetCompaniesForStudent(int studentId) 
+        {
+            var companies = GetCompaniesDataByRole("Student");
+
+            var studentSlectedCompanies = _studentSelectedCompanyRepository.GetStudentSelectedCompanies(studentId);
+
+            foreach (var item in companies)
+            {
+                if (studentSlectedCompanies.Any(c => c.Company_Id == item.id))
+                {
+                    item.status = "Selected";
+                } else 
+                {
+                    item.status = "Un-Selected";
+                }
+            }
+
+            return companies;
         }
     }
 }

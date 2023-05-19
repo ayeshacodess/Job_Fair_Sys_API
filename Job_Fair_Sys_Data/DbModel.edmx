@@ -100,7 +100,7 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Name="id" Type="int" Nullable="false" />
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="Company_Id" Type="int" />
           <Property Name="Student_Id" Type="int" />
           <Property Name="DummyColumn" Type="bit" />
@@ -427,7 +427,6 @@
             <End Role="Student" EntitySet="Students" />
             <End Role="StudentsFeedback" EntitySet="StudentsFeedbacks" />
           </AssociationSet>
-          <EntitySet Name="StudentSelectedCompanies" EntityType="DbModel.StudentSelectedCompany" />
           <EntitySet Name="Users" EntityType="DbModel.User" />
           <AssociationSet Name="FK_SocietyMember_User" Association="DbModel.FK_SocietyMember_User">
             <End Role="User" EntitySet="Users" />
@@ -436,10 +435,6 @@
           <AssociationSet Name="FK_Student_User" Association="DbModel.FK_Student_User">
             <End Role="User" EntitySet="Users" />
             <End Role="Student" EntitySet="Students" />
-          </AssociationSet>
-          <AssociationSet Name="FK_StudentSelectedCompanies_Student" Association="DbModel.FK_StudentSelectedCompanies_Student">
-            <End Role="Student" EntitySet="Students" />
-            <End Role="StudentSelectedCompany" EntitySet="StudentSelectedCompanies" />
           </AssociationSet>
           <EntitySet Name="StudentSkills" EntityType="DbModel.StudentSkill" />
           <AssociationSet Name="FK_CompanyStudentSkill_Skill" Association="DbModel.FK_CompanyStudentSkill_Skill">
@@ -475,6 +470,11 @@
           <AssociationSet Name="FK_CompanyRequiredSkill_Skill" Association="DbModel.FK_CompanyRequiredSkill_Skill">
             <End Role="Skill" EntitySet="Skills" />
             <End Role="CompanyRequiredSkill" EntitySet="CompanyRequiredSkills" />
+          </AssociationSet>
+          <EntitySet Name="StudentSelectedCompanies" EntityType="DbModel.StudentSelectedCompany" />
+          <AssociationSet Name="FK_StudentSelectedCompanies_Student" Association="DbModel.FK_StudentSelectedCompanies_Student">
+            <End Role="Student" EntitySet="Students" />
+            <End Role="StudentSelectedCompany" EntitySet="StudentSelectedCompanies" />
           </AssociationSet>
         </EntityContainer>
         <EntityType Name="EventFeedback">
@@ -556,8 +556,8 @@
           <NavigationProperty Name="InterviewSchedules" Relationship="DbModel.FK_InterviewSchedule_Student" FromRole="Student" ToRole="InterviewSchedule" />
           <NavigationProperty Name="StudentsFeedbacks" Relationship="DbModel.FK_StudentsFeedback_Student" FromRole="Student" ToRole="StudentsFeedback" />
           <NavigationProperty Name="User" Relationship="DbModel.FK_Student_User" FromRole="Student" ToRole="User" />
-          <NavigationProperty Name="StudentSelectedCompanies" Relationship="DbModel.FK_StudentSelectedCompanies_Student" FromRole="Student" ToRole="StudentSelectedCompany" />
           <NavigationProperty Name="StudentSkills" Relationship="DbModel.FK_CompanyStudentSkill_Student" FromRole="Student" ToRole="StudentSkill" />
+          <NavigationProperty Name="StudentSelectedCompanies" Relationship="DbModel.FK_StudentSelectedCompanies_Student" FromRole="Student" ToRole="StudentSelectedCompany" />
         </EntityType>
         <EntityType Name="StudentsFeedback">
           <Key>
@@ -630,16 +630,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityType Name="StudentSelectedCompany">
-          <Key>
-            <PropertyRef Name="id" />
-          </Key>
-          <Property Name="id" Type="Int32" Nullable="false" />
-          <Property Name="Company_Id" Type="Int32" />
-          <Property Name="Student_Id" Type="Int32" />
-          <Property Name="DummyColumn" Type="Boolean" />
-          <NavigationProperty Name="Student" Relationship="DbModel.FK_StudentSelectedCompanies_Student" FromRole="StudentSelectedCompany" ToRole="Student" />
-        </EntityType>
         <EntityType Name="User">
           <Key>
             <PropertyRef Name="Id" />
@@ -673,18 +663,6 @@
             </Principal>
             <Dependent Role="Student">
               <PropertyRef Name="UserId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_StudentSelectedCompanies_Student">
-          <End Type="DbModel.Student" Role="Student" Multiplicity="0..1" />
-          <End Type="DbModel.StudentSelectedCompany" Role="StudentSelectedCompany" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Student">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="StudentSelectedCompany">
-              <PropertyRef Name="Student_Id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -825,6 +803,28 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="StudentSelectedCompany">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Company_Id" Type="Int32" />
+          <Property Name="Student_Id" Type="Int32" />
+          <Property Name="DummyColumn" Type="Boolean" />
+          <NavigationProperty Name="Student" Relationship="DbModel.FK_StudentSelectedCompanies_Student" FromRole="StudentSelectedCompany" ToRole="Student" />
+        </EntityType>
+        <Association Name="FK_StudentSelectedCompanies_Student">
+          <End Type="DbModel.Student" Role="Student" Multiplicity="0..1" />
+          <End Type="DbModel.StudentSelectedCompany" Role="StudentSelectedCompany" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Student">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="StudentSelectedCompany">
+              <PropertyRef Name="Student_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -927,16 +927,6 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="StudentSelectedCompanies">
-            <EntityTypeMapping TypeName="DbModel.StudentSelectedCompany">
-              <MappingFragment StoreEntitySet="StudentSelectedCompanies">
-                <ScalarProperty Name="DummyColumn" ColumnName="DummyColumn" />
-                <ScalarProperty Name="Student_Id" ColumnName="Student_Id" />
-                <ScalarProperty Name="Company_Id" ColumnName="Company_Id" />
-                <ScalarProperty Name="id" ColumnName="id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="Users">
             <EntityTypeMapping TypeName="DbModel.User">
               <MappingFragment StoreEntitySet="User">
@@ -979,6 +969,16 @@
                 <ScalarProperty Name="Skill_Id" ColumnName="Skill_Id" />
                 <ScalarProperty Name="CompanyId" ColumnName="CompanyId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="StudentSelectedCompanies">
+            <EntityTypeMapping TypeName="DbModel.StudentSelectedCompany">
+              <MappingFragment StoreEntitySet="StudentSelectedCompanies">
+                <ScalarProperty Name="DummyColumn" ColumnName="DummyColumn" />
+                <ScalarProperty Name="Student_Id" ColumnName="Student_Id" />
+                <ScalarProperty Name="Company_Id" ColumnName="Company_Id" />
+                <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

@@ -11,7 +11,7 @@ namespace Job_Fair_Sys_API.Models
         public string aridNumber { get; set; }
         public string cgpa { get; set; }
         public string name { get; set; }
-
+        public int userProfileId { get; set; }
 
         public static UserViewModel ToViewModel(User user)
         {

@@ -20,17 +20,17 @@ namespace Job_Fair_Sys_API.Controllers
 
         [HttpGet]
         [Route("api/account/login")]
-        public HttpResponseMessage Login(string email, string password)
+        public HttpResponseMessage Login(string username, string password)
         {
             try
             {
 
-                if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+                if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
                 {
                     return Request.CreateResponse(HttpStatusCode.NotAcceptable, "Email or Password both are required");
                 }
 
-                var dbUser = _accountRepository.IsAuthorizedUser(email, password);
+                var dbUser = _accountRepository.IsAuthorizedUser(username, password);
                 
 
                 if(dbUser is null)
@@ -45,8 +45,9 @@ namespace Job_Fair_Sys_API.Controllers
                     var dbStudent = _accountRepository.DbContext.Students.FirstOrDefault(x => x.AridNumber == user.username);
                     if (dbStudent != null)
                     {
+                        user.userProfileId = dbStudent.Id;
                         user.name = dbStudent.Name;
-                        user.cgpa = dbStudent.CGPA != null ?  dbStudent.CGPA.ToString() : "0.00";
+                        user.cgpa = dbStudent.CGPA != null ?  dbStudent.CGPA.ToString() : "0.00"; //have to take from db
                         user.aridNumber = dbStudent.AridNumber;
                     }
                 }

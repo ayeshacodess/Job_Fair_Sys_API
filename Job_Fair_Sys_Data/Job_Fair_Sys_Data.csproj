@@ -87,6 +87,7 @@
     <Compile Include="Repositories\SkillRepository.cs" />
     <Compile Include="Repositories\SocietyMemberRepository.cs" />
     <Compile Include="Repositories\StudentRepository.cs" />
+    <Compile Include="Repositories\StudentSelectedCompanyRepository.cs" />
     <Compile Include="Skill.cs">
       <DependentUpon>DbModel.tt</DependentUpon>
     </Compile>

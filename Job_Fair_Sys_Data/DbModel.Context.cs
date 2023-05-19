@@ -33,10 +33,10 @@ namespace Job_Fair_Sys_Data
         public DbSet<Student> Students { get; set; }
         public DbSet<StudentsFeedback> StudentsFeedbacks { get; set; }
         public DbSet<sysdiagram> sysdiagrams { get; set; }
-        public DbSet<StudentSelectedCompany> StudentSelectedCompanies { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<StudentSkill> StudentSkills { get; set; }
         public DbSet<Company> Companies { get; set; }
         public DbSet<CompanyRequiredSkill> CompanyRequiredSkills { get; set; }
+        public DbSet<StudentSelectedCompany> StudentSelectedCompanies { get; set; }
     }
 }

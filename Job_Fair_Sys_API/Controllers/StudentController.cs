@@ -122,7 +122,7 @@ namespace Job_Fair_Sys_API.Controllers
                             var newRequiredSkill = new StudentSkill
                             {
                                 Level_Id = skill.level_Id,
-                                Skill = skl
+                                Skill = skl //skill id q nai di yahan
                             };
 
                             dbStd.StudentSkills.Add(newRequiredSkill);
