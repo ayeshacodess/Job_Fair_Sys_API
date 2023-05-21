@@ -12,6 +12,7 @@ namespace Job_Fair_Sys_API.Models
         public string cgpa { get; set; }
         public string name { get; set; }
         public int userProfileId { get; set; }
+        public string FypGrade { get; set; }
 
         public static UserViewModel ToViewModel(User user)
         {

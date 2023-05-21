@@ -15,10 +15,11 @@ namespace Job_Fair_Sys_Data
     public partial class StudentSelectedCompany
     {
         public int id { get; set; }
-        public Nullable<int> Company_Id { get; set; }
-        public Nullable<int> Student_Id { get; set; }
+        public int Company_Id { get; set; }
+        public int Student_Id { get; set; }
         public Nullable<bool> DummyColumn { get; set; }
     
+        public virtual Company Company { get; set; }
         public virtual Student Student { get; set; }
     }
 }

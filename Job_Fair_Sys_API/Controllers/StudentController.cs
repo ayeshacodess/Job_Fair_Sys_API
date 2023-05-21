@@ -46,7 +46,7 @@ namespace Job_Fair_Sys_API.Controllers
         {
             try
             {
-                var students = _studentRepository.GetStudents().Take(100).ToList();
+                var students = _studentRepository.GetStudents().Take(50).ToList();
                 var studentModels = new List<StudentViewModel>();
                 foreach (var item in students)
                 {
@@ -81,7 +81,6 @@ namespace Job_Fair_Sys_API.Controllers
 
         [HttpPost]
         [Route("api/student/uploadcv")]
-        //[EnableCors(origins: "*", headers: "*", methods: "*")]
         public async Task<HttpResponseMessage>  UpLoadCV()
         {
             var httpRequest = HttpContext.Current.Request;
@@ -101,7 +100,6 @@ namespace Job_Fair_Sys_API.Controllers
                         dbStd.StudyStatus = reqData.studyStatus;
                         dbStd.Contact1 = reqData.contact1;
                         dbStd.Contact2 = reqData.contact2;
-                        dbStd.FypGrad = reqData.FypGrad;
                         dbStd.FypTech = reqData.FypTech;
                         dbStd.FypTitle = reqData.FypTitle;
                         dbStd.HasFYP = reqData.hasFYP;
@@ -122,7 +120,7 @@ namespace Job_Fair_Sys_API.Controllers
                             var newRequiredSkill = new StudentSkill
                             {
                                 Level_Id = skill.level_Id,
-                                Skill = skl //skill id q nai di yahan
+                                Skill = skl 
                             };
 
                             dbStd.StudentSkills.Add(newRequiredSkill);

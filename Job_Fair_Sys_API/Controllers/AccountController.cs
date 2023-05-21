@@ -47,8 +47,9 @@ namespace Job_Fair_Sys_API.Controllers
                     {
                         user.userProfileId = dbStudent.Id;
                         user.name = dbStudent.Name;
-                        user.cgpa = dbStudent.CGPA != null ?  dbStudent.CGPA.ToString() : "0.00"; //have to take from db
+                        user.cgpa = dbStudent.CGPA != null ?  dbStudent.CGPA.ToString() : "0.00"; 
                         user.aridNumber = dbStudent.AridNumber;
+                        user.FypGrade = dbStudent.FypGrad != null? dbStudent.FypGrad : "grade not found";
                     }
                 }
 

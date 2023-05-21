@@ -26,8 +26,8 @@ namespace Job_Fair_Sys_Data
         public string Description { get; set; }
         public string AllocatedRoom { get; set; }
     
+        public virtual Company Company { get; set; }
         public virtual SocietyMember SocietyMember { get; set; }
         public virtual Student Student { get; set; }
-        public virtual Company Company { get; set; }
     }
 }

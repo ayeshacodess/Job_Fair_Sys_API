@@ -16,7 +16,6 @@ namespace Job_Fair_Sys_API.Models
         public string contact1 { get; set; }
         public string contact2 { get; set; }
         public Nullable<bool> gender { get; set; }
-        public Nullable<double> cgpa { get; set; }
         public string cvpath { get; set; }
         public Nullable<bool> hasFYP { get; set; }
         public string FypTitle { get; set; }
@@ -39,7 +38,6 @@ namespace Job_Fair_Sys_API.Models
                 Contact2 = this.contact2,
                 CVPath = this.cvpath,
                 Gender = this.gender,
-                CGPA = this.cgpa,
                 HasFYP = this.hasFYP,
                 FypGrad = this.FypGrad,
                 FypTitle = this.FypTitle,
@@ -63,7 +61,6 @@ namespace Job_Fair_Sys_API.Models
                 contact2 = student.Contact2,
                 cvpath = student.CVPath,
                 gender = student.Gender,
-                cgpa = student.CGPA,
                 FypGrad = student.FypGrad,
                 FypTech = student.FypTech,
                 FypTitle = student.FypTitle,

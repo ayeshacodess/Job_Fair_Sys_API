@@ -16,14 +16,14 @@ namespace Job_Fair_Sys_Data
     {
         public Skill()
         {
-            this.StudentSkills = new HashSet<StudentSkill>();
             this.CompanyRequiredSkills = new HashSet<CompanyRequiredSkill>();
+            this.StudentSkills = new HashSet<StudentSkill>();
         }
     
         public int Id { get; set; }
         public string Technology { get; set; }
     
-        public virtual ICollection<StudentSkill> StudentSkills { get; set; }
         public virtual ICollection<CompanyRequiredSkill> CompanyRequiredSkills { get; set; }
+        public virtual ICollection<StudentSkill> StudentSkills { get; set; }
     }
 }
