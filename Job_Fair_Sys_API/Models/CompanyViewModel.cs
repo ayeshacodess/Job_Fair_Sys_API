@@ -16,7 +16,7 @@ namespace Job_Fair_Sys_API.Models
         public int timeSlot { get; set; }
         public string profile { get; set; }
         public string status { get; set; }
-
+        public string email { get; set; }
         public List<CompanySkillViewModel> skills { get; set; }
 
         public Company ToEntity()
@@ -32,6 +32,7 @@ namespace Job_Fair_Sys_API.Models
                 TimeSlot = this.timeSlot,
                 Profile = this.profile,
                 Status = this.status,
+                Email = this.email
             };
 
             return entity;

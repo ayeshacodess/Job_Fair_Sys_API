@@ -18,6 +18,7 @@
           <Property Name="TimeSlot" Type="int" />
           <Property Name="Profile" Type="nvarchar" MaxLength="50" />
           <Property Name="Status" Type="nvarchar" MaxLength="50" />
+          <Property Name="Email" Type="nvarchar" MaxLength="100" />
         </EntityType>
         <EntityType Name="CompanyRequiredSkill">
           <Key>
@@ -52,9 +53,9 @@
           <Property Name="CompanyId" Type="int" Nullable="false" />
           <Property Name="SocietyMemberId" Type="int" Nullable="false" />
           <Property Name="Date" Type="datetime" Nullable="false" />
-          <Property Name="TimeSlot" Type="int" Nullable="false" />
-          <Property Name="StartTime" Type="datetime" />
-          <Property Name="EndTime" Type="datetime" />
+          <Property Name="TimeDuration" Type="int" Nullable="false" />
+          <Property Name="StartTime" Type="nvarchar" MaxLength="50" />
+          <Property Name="EndTime" Type="nvarchar" MaxLength="50" />
           <Property Name="Interviewed" Type="bit" Nullable="false" />
           <Property Name="Description" Type="nvarchar(max)" />
           <Property Name="AllocatedRoom" Type="nvarchar" MaxLength="30" />
@@ -530,6 +531,7 @@
           <Property Name="TimeSlot" Type="Int32" />
           <Property Name="Profile" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="Status" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Email" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="Company1" Relationship="DbModel.FK_Company_Company" FromRole="Company" ToRole="Company1" />
           <NavigationProperty Name="Company2" Relationship="DbModel.FK_Company_Company" FromRole="Company1" ToRole="Company" />
           <NavigationProperty Name="User" Relationship="DbModel.FK_Company_User" FromRole="Company" ToRole="User" />
@@ -576,9 +578,9 @@
           <Property Name="CompanyId" Type="Int32" Nullable="false" />
           <Property Name="SocietyMemberId" Type="Int32" Nullable="false" />
           <Property Name="Date" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="TimeSlot" Type="Int32" Nullable="false" />
-          <Property Name="StartTime" Type="DateTime" Precision="3" />
-          <Property Name="EndTime" Type="DateTime" Precision="3" />
+          <Property Name="TimeDuration" Type="Int32" Nullable="false" />
+          <Property Name="StartTime" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="EndTime" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="Interviewed" Type="Boolean" Nullable="false" />
           <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="AllocatedRoom" Type="String" MaxLength="30" FixedLength="false" Unicode="true" />
@@ -902,6 +904,7 @@
           <EntitySetMapping Name="Companies">
             <EntityTypeMapping TypeName="DbModel.Company">
               <MappingFragment StoreEntitySet="Company">
+                <ScalarProperty Name="Email" ColumnName="Email" />
                 <ScalarProperty Name="Status" ColumnName="Status" />
                 <ScalarProperty Name="Profile" ColumnName="Profile" />
                 <ScalarProperty Name="TimeSlot" ColumnName="TimeSlot" />
@@ -949,7 +952,7 @@
                 <ScalarProperty Name="Interviewed" ColumnName="Interviewed" />
                 <ScalarProperty Name="EndTime" ColumnName="EndTime" />
                 <ScalarProperty Name="StartTime" ColumnName="StartTime" />
-                <ScalarProperty Name="TimeSlot" ColumnName="TimeSlot" />
+                <ScalarProperty Name="TimeDuration" ColumnName="TimeDuration" />
                 <ScalarProperty Name="Date" ColumnName="Date" />
                 <ScalarProperty Name="SocietyMemberId" ColumnName="SocietyMemberId" />
                 <ScalarProperty Name="CompanyId" ColumnName="CompanyId" />

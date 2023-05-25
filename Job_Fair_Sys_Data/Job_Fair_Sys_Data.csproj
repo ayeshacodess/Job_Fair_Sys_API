@@ -84,6 +84,7 @@
     <Compile Include="Repositories\BaseRepository.cs" />
     <Compile Include="Repositories\EventFeedbackRepository.cs" />
     <Compile Include="Repositories\CompanyRepository.cs" />
+    <Compile Include="Repositories\ScheduleRepository.cs" />
     <Compile Include="Repositories\SkillRepository.cs" />
     <Compile Include="Repositories\SocietyMemberRepository.cs" />
     <Compile Include="Repositories\StudentRepository.cs" />

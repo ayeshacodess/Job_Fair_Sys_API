@@ -32,6 +32,7 @@ namespace Job_Fair_Sys_Data
         public Nullable<int> TimeSlot { get; set; }
         public string Profile { get; set; }
         public string Status { get; set; }
+        public string Email { get; set; }
     
         public virtual Company Company1 { get; set; }
         public virtual Company Company2 { get; set; }

@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 
@@ -17,11 +18,13 @@ namespace Job_Fair_Sys_API.Controllers
     {
         private readonly CompanyRepository _companyRespository;
         private readonly StudentSelectedCompanyRepository _studentSelectedCompanyRepository;
+        private readonly AccountRepository _accountRepository;
 
         public CompanyController()
         {
             _studentSelectedCompanyRepository = new StudentSelectedCompanyRepository();
             _companyRespository = new CompanyRepository();
+            _accountRepository = new AccountRepository();
         }
 
         [HttpGet]
@@ -61,7 +64,8 @@ namespace Job_Fair_Sys_API.Controllers
                         Contact2 = company.contact2,
                         TimeSlot = company.timeSlot,
                         NoOfInterviewers = company.noOfInterviewers,
-                        Status = "Pending"
+                        Status = "Pending",
+                        Email = company.email
                     };
 
                     //_companyRespository.Add(entity);
@@ -73,7 +77,7 @@ namespace Job_Fair_Sys_API.Controllers
 
                         var newRequiredSkill = new CompanyRequiredSkill
                         {
-                            NoOfInterviewers = 0, // y zero ? 2 attributes q liye hen
+                            NoOfInterviewers = 0, 
                             Skill = skill
                         };
 
@@ -81,7 +85,6 @@ namespace Job_Fair_Sys_API.Controllers
                     }
 
                     _companyRespository.Add(entity);
-
                     return Request.CreateResponse(HttpStatusCode.OK, company);
                 }
                 catch (Exception ex)
@@ -148,18 +151,64 @@ namespace Job_Fair_Sys_API.Controllers
         [Route("api/company/status")]
         public HttpResponseMessage SetAcceptRejectStatus(string status, int companyId)
         {
-            var company = _companyRespository.GetCompany(companyId);
+            //if()
+            try
+            {
+                var company = _companyRespository.GetCompany(companyId);
+                var u = _accountRepository.GetUser(company.Email);
+                if (company == null)
+                    return Request.CreateResponse(HttpStatusCode.NotFound);
+                
 
-            if (company == null) 
-                return Request.CreateResponse(HttpStatusCode.NotFound);
+                company.Status = status;
+                _companyRespository.DbContext.Entry(company).CurrentValues.SetValues(company);
+                _companyRespository.SaveChanges();
 
-            company.Status = status;
-            _companyRespository.DbContext.Entry(company).CurrentValues.SetValues(company);
-            _companyRespository.SaveChanges();
+                var updatedCompanies = GetCompaniesDataByRole("Admin");
+                var dbUser = _accountRepository.IsAuthorizedUser(company.Email, company.Contact1);
+                
+                //pending to accept
+                if (status == "Accept" && dbUser is null)
+                {
+                    #region pending to accept
+                    var user = new User
+                    {
+                        Username = company.Email,
+                        Password = company.Contact1,
+                        Role = "Company"
+                    };
+                    // li.Add(user);
+                    _companyRespository.AddUser(user);
+                    #endregion End!
+                }
+                else if (status == "Reject" && dbUser != null)
+                {
+                    #region accept to reject
+                    _accountRepository.RemoveUser(u);
+                    string v = _companyRespository.AcceptToRemoveCompany(u);
+                    #endregion End!
+                }
+                else if (status == "Reject" && dbUser == null)
+                {
+                    #region Pending to reject
 
-            var updatedCompanies = GetCompaniesDataByRole("Admin");
+                    string v = _companyRespository.PendingToRemoveCompany(companyId);
+                    #endregion End!
+                }
+                else { 
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Please Click again!");
+                } 
 
-            return Request.CreateResponse(HttpStatusCode.OK, updatedCompanies);
+               
+                
+                return Request.CreateResponse(HttpStatusCode.OK, updatedCompanies);
+            }
+            catch (Exception ex)
+            {
+
+                return Request.CreateResponse(HttpStatusCode.BadRequest, ex.Message);
+            }
+            
         }
 
         [HttpGet]
@@ -208,6 +257,7 @@ namespace Job_Fair_Sys_API.Controllers
             return models;
         }
 
+        //method to show on frontend companies listview to students 
         private List<CompanyViewModel> GetCompaniesForStudent(int studentId) 
         {
             var companies = GetCompaniesDataByRole("Student");

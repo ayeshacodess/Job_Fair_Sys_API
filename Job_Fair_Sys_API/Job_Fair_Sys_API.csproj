@@ -169,10 +169,10 @@
     <Compile Include="Controllers\CompanyController.cs" />
     <Compile Include="Controllers\EventFeedBackController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\ScheduleController.cs" />
     <Compile Include="Controllers\SkillController.cs" />
     <Compile Include="Controllers\SocietyMemberController.cs" />
     <Compile Include="Controllers\StudentController.cs" />
-    <Compile Include="Controllers\ValuesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -180,6 +180,7 @@
     <Compile Include="Models\EventFeedbackViewModel.cs" />
     <Compile Include="Models\MemberViewModel.cs" />
     <Compile Include="Models\ModelConvertor.cs" />
+    <Compile Include="Models\ScheduleViewModel.cs" />
     <Compile Include="Models\SkillViewModel.cs" />
     <Compile Include="Models\StudentViewModel.cs" />
     <Compile Include="Models\UserViewModel.cs" />
