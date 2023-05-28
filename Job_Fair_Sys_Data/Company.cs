@@ -18,9 +18,9 @@ namespace Job_Fair_Sys_Data
         {
             this.CompanyRequiredSkills = new HashSet<CompanyRequiredSkill>();
             this.EventFeedbacks = new HashSet<EventFeedback>();
-            this.InterviewSchedules = new HashSet<InterviewSchedule>();
             this.StudentSelectedCompanies = new HashSet<StudentSelectedCompany>();
             this.StudentsFeedbacks = new HashSet<StudentsFeedback>();
+            this.InterviewSchedules = new HashSet<InterviewSchedule>();
         }
     
         public int Id { get; set; }
@@ -39,8 +39,8 @@ namespace Job_Fair_Sys_Data
         public virtual User User { get; set; }
         public virtual ICollection<CompanyRequiredSkill> CompanyRequiredSkills { get; set; }
         public virtual ICollection<EventFeedback> EventFeedbacks { get; set; }
-        public virtual ICollection<InterviewSchedule> InterviewSchedules { get; set; }
         public virtual ICollection<StudentSelectedCompany> StudentSelectedCompanies { get; set; }
         public virtual ICollection<StudentsFeedback> StudentsFeedbacks { get; set; }
+        public virtual ICollection<InterviewSchedule> InterviewSchedules { get; set; }
     }
 }

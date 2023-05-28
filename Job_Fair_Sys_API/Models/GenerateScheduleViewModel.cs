@@ -11,5 +11,6 @@ namespace Job_Fair_Sys_API.Models
         public int selectedCompany { get; set; }
         public string allocatedRoom { get; set; }
         public int timeDuration { get; set; }
+        public string role { get; set; }
     }
 }

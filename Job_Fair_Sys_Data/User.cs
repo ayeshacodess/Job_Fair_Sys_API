@@ -19,6 +19,7 @@ namespace Job_Fair_Sys_Data
             this.Companies = new HashSet<Company>();
             this.SocietyMembers = new HashSet<SocietyMember>();
             this.Students = new HashSet<Student>();
+            this.InterviewSchedules = new HashSet<InterviewSchedule>();
         }
     
         public int Id { get; set; }
@@ -29,5 +30,6 @@ namespace Job_Fair_Sys_Data
         public virtual ICollection<Company> Companies { get; set; }
         public virtual ICollection<SocietyMember> SocietyMembers { get; set; }
         public virtual ICollection<Student> Students { get; set; }
+        public virtual ICollection<InterviewSchedule> InterviewSchedules { get; set; }
     }
 }

@@ -17,7 +17,8 @@ namespace Job_Fair_Sys_Data
         public int Id { get; set; }
         public int StudentId { get; set; }
         public int CompanyId { get; set; }
-        public int SocietyMemberId { get; set; }
+        public Nullable<int> SocietyMemberId { get; set; }
+        public Nullable<int> AdminId { get; set; }
         public System.DateTime Date { get; set; }
         public int TimeDuration { get; set; }
         public Nullable<System.DateTime> StartTime { get; set; }
@@ -29,5 +30,6 @@ namespace Job_Fair_Sys_Data
         public virtual Company Company { get; set; }
         public virtual SocietyMember SocietyMember { get; set; }
         public virtual Student Student { get; set; }
+        public virtual User User { get; set; }
     }
 }

@@ -16,7 +16,6 @@ namespace Job_Fair_Sys_API.Controllers
 {
     public class ScheduleController : ApiController
     {
-        protected readonly JobFairMgtEntities _dbContext = new JobFairMgtEntities();
         private readonly ScheduleRepository _scheduleRepository;
         private readonly CompanyRepository _companyRespository;
         public ScheduleController()
@@ -25,7 +24,26 @@ namespace Job_Fair_Sys_API.Controllers
             _companyRespository = new CompanyRepository();
         }
 
-        [HttpPost]
+        //role, userid...get schedule
+        [HttpGet]
+        [Route("api/schedule/get")]
+        public HttpResponseMessage Get(string role, int userId)
+        {
+            try
+            {
+                //schedule
+                //companies
+                //students
+
+
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+            [HttpPost]
         [Route("api/schedule/generate")]
         public async System.Threading.Tasks.Task<HttpResponseMessage> scheduleAsync()
         {
@@ -36,46 +54,76 @@ namespace Job_Fair_Sys_API.Controllers
                 try
                 {
                    string requestBody = reader.ReadToEnd();
+                    var reqModel = JsonConvert.DeserializeObject<GenerateScheduleViewModel>(requestBody);
 
-                  var ob = JsonConvert.DeserializeObject<GenerateScheduleViewModel>(requestBody);
+                    //-------------------------
+                    var company = _companyRespository.GetCompany(reqModel.selectedCompany);
 
-                    //List<InterviewSchedule> schedule = new List<InterviewSchedule>();
-                    //List<StudentSelectedCompany> students = _scheduleRepository.GetStudents(ob.selectedCompany);
-                    //var company = _companyRespository.GetCompany(ob.selectedCompany);
-                    //var CompanyTime = company.TimeSlot;
-                    //var comTime = company.TimeSlot;
-                    //TimeSpan startTime9 = TimeSpan.FromHours(9);
-                    //TimeSpan startTime12 = TimeSpan.FromHours(12);
-                    //TimeSpan timeDuration = TimeSpan.FromMinutes(ob.timeDuration);
-                    //TimeSpan endTime;
-                    //foreach (var s in students)
-                    //{
-                    //    schedule.Add(new InterviewSchedule
-                    //    {
-                    //        StudentId = s.Student_Id,
-                    //        CompanyId = ob.selectedCompany,
-                    //        SocietyMemberId = ob.UserProfile,
-                    //        Date = DateTime.Now,
-                    //        TimeDuration = ob.timeDuration,
-                    //        AllocatedRoom = ob.allocatedRoom,
-                    //       if (comTime == startTime9)
-                    //    {
+                    var startTime = GetCompanyStartTimeByTimeSlot(company.TimeSlot ?? 0);
+                    var students = _scheduleRepository.GetStudents(company.Id);
 
-                    //    }
-                    //    if (comTime == startTime12)
-                    //    {
+                    if (startTime != null) {
+                        List<InterviewSchedule> schedules = new List<InterviewSchedule>();
 
-                    //    }
+                        foreach (var std in students)
+                        {
+                            var scd = new InterviewSchedule();
 
-                    //});
-                    //    _scheduleRepository.AddSchedule(schedule);
-                    return Request.CreateResponse(HttpStatusCode.OK, ob);
+                            var scheduleStartTime = new DateTime(startTime.Value.Year, startTime.Value.Month, startTime.Value.Day, startTime.Value.Hour, startTime.Value.Minute, startTime.Value.Second);
+                            var scheduleEndTime = new DateTime(startTime.Value.Year, startTime.Value.Month, startTime.Value.Day, startTime.Value.Hour, startTime.Value.Minute, startTime.Value.Second);
+                            scheduleEndTime = scheduleEndTime.AddMinutes(reqModel.timeDuration);
+
+                            scd.StudentId = std.Student_Id;
+                            scd.CompanyId = company.Id;
+
+                            if (reqModel.role == "SocietyMember")
+                                scd.SocietyMemberId = reqModel.UserProfile;
+
+                            if (reqModel.role == "Admin")
+                                scd.AdminId = reqModel.UserProfile;
+
+                            scd.AllocatedRoom = reqModel.allocatedRoom;
+                            scd.StartTime = scheduleStartTime;
+                            scd.EndTime = scheduleEndTime;
+                            scd.Interviewed = false;
+                            scd.Date = DateTime.Now;
+
+                            startTime = scheduleEndTime;
+
+                            schedules.Add(scd);
+                        }
+
+                        _scheduleRepository.AddSchedules(schedules);
+                    }
+
+                    return Request.CreateResponse(HttpStatusCode.OK, reqModel);
                 }
                     
                   catch (Exception ex)
                 {
                     return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
                 }
+            }
+        }
+
+        private DateTime? GetCompanyStartTimeByTimeSlot(int timeSlot)
+        {
+            var today = DateTime.Now;
+            var nineAm = new DateTime(today.Year, today.Month, today.Day, 9, 0, 0);
+            switch (timeSlot)
+            {
+                case 1:
+                    //9-12
+                    return nineAm;
+                case 2:
+                    var twelvePm = new DateTime(today.Year, today.Month, today.Day, 12, 0, 0);
+                    return twelvePm;
+                case 3:
+                    //9-5
+                    return nineAm;
+
+                default: return null;
+                   
             }
         }
     }

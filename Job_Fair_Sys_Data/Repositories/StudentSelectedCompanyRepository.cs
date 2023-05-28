@@ -13,6 +13,12 @@ namespace Job_Fair_Sys_Data.Repositories
 
         }
 
+        public List<StudentSelectedCompany> GetCompanySelectedStudents(int companyId) 
+        {
+            var data = _dbContext.StudentSelectedCompanies.Where(c => c.Company_Id == companyId).ToList();
+            return data; 
+        }
+
         public List<StudentSelectedCompany> GetStudentSelectedCompanies(int studentId)
         {
             var companies = _dbContext.StudentSelectedCompanies.Where(c => c.Student_Id == studentId).ToList();
@@ -31,7 +37,7 @@ namespace Job_Fair_Sys_Data.Repositories
             _dbContext.SaveChanges();
         }
 
-        public void Remove(StudentSelectedCompany company)
+        public void Remove(StudentSelectedCompany company) 
         {
             _dbContext.StudentSelectedCompanies.Remove(company);
             _dbContext.SaveChanges();

@@ -23,14 +23,7 @@ namespace Job_Fair_Sys_API.Controllers
         {
             try
             {
-                var dbSkills = _skillRepository.GetSkills();
-                var skills = new List<SkillViewModel>();
-
-                foreach (var item in dbSkills)
-                {
-                    skills.Add(SkillViewModel.ToViewModel(item));
-                }
-
+                var skills = GetSkillsFromDb();
                 return Request.CreateResponse(HttpStatusCode.OK, skills);
             }
             catch (Exception ex)
@@ -60,13 +53,27 @@ namespace Job_Fair_Sys_API.Controllers
             try
             {
                 var skills = _skillRepository.DeleteSkill(skill_Id);
-                return Request.CreateResponse(HttpStatusCode.OK);
+                var updatedSKill = GetSkillsFromDb();
+                return Request.CreateResponse(HttpStatusCode.OK, updatedSKill);
             }
             catch (Exception)
             {
 
                 throw;
             }
+        }
+
+        private List<SkillViewModel> GetSkillsFromDb() 
+        {
+            var dbSkills = _skillRepository.GetSkills();
+            var skills = new List<SkillViewModel>();
+
+            foreach (var item in dbSkills)
+            {
+                skills.Add(SkillViewModel.ToViewModel(item));
+            }
+
+            return skills;
         }
     }
 }
