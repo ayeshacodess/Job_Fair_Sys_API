@@ -33,11 +33,12 @@ namespace Job_Fair_Sys_API.Controllers
 
                 return Request.CreateResponse(HttpStatusCode.OK, skills);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
+        [Route("api/addSkills")]
         [HttpPost]
         public HttpResponseMessage AddSkill(Skill skill)
         {
@@ -49,6 +50,22 @@ namespace Job_Fair_Sys_API.Controllers
             catch (Exception ex)
             {
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/skill/delete")]
+        public HttpResponseMessage Delete(int skill_Id)
+        {
+            try
+            {
+                var skills = _skillRepository.DeleteSkill(skill_Id);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception)
+            {
+
+                throw;
             }
         }
     }

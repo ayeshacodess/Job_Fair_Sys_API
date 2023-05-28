@@ -24,6 +24,7 @@ namespace Job_Fair_Sys_Data
         public string Name { get; set; }
         public bool Gender { get; set; }
         public string Contact { get; set; }
+        public string Email { get; set; }
     
         public virtual ICollection<InterviewSchedule> InterviewSchedules { get; set; }
         public virtual User User { get; set; }

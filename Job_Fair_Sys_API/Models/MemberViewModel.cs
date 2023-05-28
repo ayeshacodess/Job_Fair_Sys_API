@@ -10,7 +10,7 @@ namespace Job_Fair_Sys_API.Models
         public string name { get; set; }
         public bool gender { get; set; }
         public string contact { get; set; }
-
+        public string email { get; set; }
         public SocietyMember ToEntity()
         {
             var entity = new SocietyMember
@@ -20,6 +20,7 @@ namespace Job_Fair_Sys_API.Models
                 Name = this.name,
                 Gender = this.gender,
                 Contact = this.contact,
+                Email = this.email,
             };
 
             return entity;

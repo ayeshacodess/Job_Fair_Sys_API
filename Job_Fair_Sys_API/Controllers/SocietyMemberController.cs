@@ -1,20 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Web;
 using System.Web.Http;
 using Job_Fair_Sys_API.Models;
+using Job_Fair_Sys_Data;
 using Job_Fair_Sys_Data.Repositories;
+using Newtonsoft.Json;
 
 namespace Job_Fair_Sys_API.Controllers
 {
     public class SocietyMemberController : ApiController
-    { 
+    {
+        private readonly CompanyRepository _companyRespository;
+
         private readonly SocietyMemberRepository _societyMemberRespository;
 
         public SocietyMemberController()
         {
             _societyMemberRespository = new SocietyMemberRepository();
+            _companyRespository = new CompanyRepository();
         }
 
         [Route("api/members")]
@@ -40,20 +47,33 @@ namespace Job_Fair_Sys_API.Controllers
 
         [HttpPost]
         [Route("api/member/add")]
-        public HttpResponseMessage AddMember(MemberViewModel member)
+        public async System.Threading.Tasks.Task<HttpResponseMessage> AddMemberAsync()
         {
-            try
+            var httpRequest = HttpContext.Current.Request;
+
+            using (var reader = new StreamReader(await Request.Content.ReadAsStreamAsync()))
             {
-                if (member == null) return Request.CreateResponse(HttpStatusCode.NotAcceptable);
+                try
+                {
+                    string reqBody = reader.ReadToEnd();
 
-                var entity = member.ToEntity();                    
-                _societyMemberRespository.Add(entity);
-
-                return Request.CreateResponse(HttpStatusCode.OK, member);
-            }
-            catch (Exception ex)
+                    var member = JsonConvert.DeserializeObject<MemberViewModel>(reqBody);
+                    if (member == null) return Request.CreateResponse(HttpStatusCode.NotAcceptable);
+                    var entity = member.ToEntity();
+                   _societyMemberRespository.Add(entity);
+                    User user = new User
+                    {
+                        Username = member.email,
+                        Password = "abc@123",
+                        Role = "Society Member"
+                    };
+                    _companyRespository.AddUser(user);
+                    return Request.CreateResponse(HttpStatusCode.OK, member);
+                }
+             catch (Exception ex)
             {
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
             }
         }
 
@@ -79,6 +99,35 @@ namespace Job_Fair_Sys_API.Controllers
                 _societyMemberRespository.SaveChanges();
 
                 return Request.CreateResponse(HttpStatusCode.OK, member);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+
+        [HttpGet]
+        [Route("api/member/delete")]
+        public HttpResponseMessage Delete(int memberId)
+        {
+            try
+            {
+                var member = _societyMemberRespository.GetMember(memberId);
+                if (member is null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound);
+                }
+                List<SocietyMember> List = _societyMemberRespository.DeleteMember(member);
+                var members = _societyMemberRespository.GetSocietyMembers();
+                List<MemberViewModel> models = new List<MemberViewModel>();
+
+                foreach (var item in members)
+                {
+                    models.Add(MemberViewModel.ToViewModel(item));
+                }
+
+                return Request.CreateResponse(HttpStatusCode.OK, models);
             }
             catch (Exception ex)
             {

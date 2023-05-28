@@ -178,6 +178,7 @@
     </Compile>
     <Compile Include="Models\CompanyViewModel.cs" />
     <Compile Include="Models\EventFeedbackViewModel.cs" />
+    <Compile Include="Models\GenerateScheduleViewModel.cs" />
     <Compile Include="Models\MemberViewModel.cs" />
     <Compile Include="Models\ModelConvertor.cs" />
     <Compile Include="Models\ScheduleViewModel.cs" />
@@ -239,6 +240,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="CV\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />

@@ -76,6 +76,7 @@
           <Property Name="Name" Type="nvarchar" MaxLength="200" Nullable="false" />
           <Property Name="Gender" Type="bit" Nullable="false" />
           <Property Name="Contact" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Email" Type="nvarchar" MaxLength="100" />
         </EntityType>
         <EntityType Name="Student">
           <Key>
@@ -606,6 +607,7 @@
           <Property Name="Name" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
           <Property Name="Gender" Type="Boolean" Nullable="false" />
           <Property Name="Contact" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Email" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="InterviewSchedules" Relationship="DbModel.FK_InterviewSchedule_SocietyMember" FromRole="SocietyMember" ToRole="InterviewSchedule" />
           <NavigationProperty Name="User" Relationship="DbModel.FK_SocietyMember_User" FromRole="SocietyMember" ToRole="User" />
         </EntityType>
@@ -972,6 +974,7 @@
           <EntitySetMapping Name="SocietyMembers">
             <EntityTypeMapping TypeName="DbModel.SocietyMember">
               <MappingFragment StoreEntitySet="SocietyMember">
+                <ScalarProperty Name="Email" ColumnName="Email" />
                 <ScalarProperty Name="Contact" ColumnName="Contact" />
                 <ScalarProperty Name="Gender" ColumnName="Gender" />
                 <ScalarProperty Name="Name" ColumnName="Name" />

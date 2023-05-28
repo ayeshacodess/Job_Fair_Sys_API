@@ -38,5 +38,24 @@ namespace Job_Fair_Sys_Data.Repositories
 
             return _dbContext.SaveChanges();
         }
+        public List<SocietyMember> DeleteMember(SocietyMember member) //opps member ka account b del krna hoga, wo kr lungi but frontend se debugger q nai
+            ////wi8 na yaar krny to den phly okkkk, iska bana k rakha tha pr mila nai mje #mess ab thk ha? g
+        {
+            try
+            {
+                var dbmember = _dbContext.SocietyMembers.FirstOrDefault(c => c.Id == member.Id);
+                _dbContext.SocietyMembers.Remove(dbmember);
+                var user = _dbContext.Users.Where(u => u.Username == member.Email).FirstOrDefault();
+                _dbContext.Users.Remove(user);
+                _dbContext.SaveChanges();
+                return _dbContext.SocietyMembers.ToList();
+            }
+            catch (Exception)
+            {
+               
+                throw;
+            }
+           
+        }
     }
 }

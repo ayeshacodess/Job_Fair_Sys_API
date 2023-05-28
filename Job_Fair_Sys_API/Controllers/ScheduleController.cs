@@ -37,7 +37,7 @@ namespace Job_Fair_Sys_API.Controllers
                 {
                    string requestBody = reader.ReadToEnd();
 
-                  var ob = JsonConvert.DeserializeObject<ScheduleViewModel>(requestBody);
+                  var ob = JsonConvert.DeserializeObject<GenerateScheduleViewModel>(requestBody);
 
         //            List<InterviewSchedule> schedule = new List<InterviewSchedule>();
         //            List<StudentSelectedCompany> students = _scheduleRepository.GetStudents(ob.);

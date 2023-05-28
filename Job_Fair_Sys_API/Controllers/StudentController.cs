@@ -62,16 +62,19 @@ namespace Job_Fair_Sys_API.Controllers
             }
         }
 
-        public HttpResponseMessage Get(int id)
+        [HttpGet]
+        [Route("api/student/delete")]
+        public HttpResponseMessage Delete(string status, int studentId)
         {
             try
             {
-                var student = _studentRepository.GetStudent(id);
+                var student = _studentRepository.GetStudent(studentId);
                 if(student is null)
                 {
                     return Request.CreateResponse(HttpStatusCode.NotFound);
                 }
-                return Request.CreateResponse(HttpStatusCode.OK, student);
+                var List=_studentRepository.DeleteStudent(student);
+                return Request.CreateResponse(HttpStatusCode.OK, List);
             }
             catch (Exception ex)
             {
@@ -79,6 +82,7 @@ namespace Job_Fair_Sys_API.Controllers
             }
         }
 
+       // uploadCVUsingUpdateFunction
         [HttpPost]
         [Route("api/student/uploadcv")]
         public async Task<HttpResponseMessage>  UpLoadCV()
@@ -92,7 +96,7 @@ namespace Job_Fair_Sys_API.Controllers
                     string requestBody = reader.ReadToEnd();
 
                     var reqData = JsonConvert.DeserializeObject<StudentViewModel>(requestBody);
-
+                    Console.WriteLine(reqData);
                      var dbStd = _studentRepository.GetStudentByAridNo(reqData.aridNumber);
                    
                     if (dbStd != null)
@@ -126,7 +130,25 @@ namespace Job_Fair_Sys_API.Controllers
 
                             dbStd.StudentSkills.Add(newRequiredSkill);
                         }
-                        
+                        HttpResponseMessage result = null;
+                        if (HttpContext.Current.Request.Files.Count > 0)
+                        {
+                            var docfiles = new List<string>();
+                            foreach (string file in httpRequest.Files)
+                            {
+                                var postedFile = httpRequest.Files[file];
+                                var filePath = HttpContext.Current.Server.MapPath("~/CV" + postedFile.FileName);
+                                postedFile.SaveAs(filePath);
+                                docfiles.Add(filePath);
+                            }
+                            result = Request.CreateResponse(HttpStatusCode.Created, docfiles);
+
+
+                        }
+                        else
+                        {
+                            result = Request.CreateResponse(HttpStatusCode.BadRequest);
+                        }
                         _studentRepository.DbContext.Entry(dbStd).CurrentValues.SetValues(dbStd);
                         _studentRepository.SaveChanges();
 
@@ -150,7 +172,7 @@ namespace Job_Fair_Sys_API.Controllers
             //    foreach (string file in httpRequest.Files)
             //    {
             //        var postedFile = httpRequest.Files[file];
-            //        var filePath = HttpContext.Current.Server.MapPath("~/" + postedFile.FileName);
+            //        var filePath = HttpContext.Current.Server.MapPath("~/CV" + postedFile.FileName);
             //        postedFile.SaveAs(filePath);
             //        docfiles.Add(filePath);
             //    }

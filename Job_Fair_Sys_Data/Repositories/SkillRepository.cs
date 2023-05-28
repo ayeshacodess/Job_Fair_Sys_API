@@ -28,5 +28,12 @@ namespace Job_Fair_Sys_Data.Repositories
             _dbContext.Entry(dbSkill).CurrentValues.SetValues(skill);
             return _dbContext.SaveChanges() > 0;
         }
+
+        public bool DeleteSkill(int id)
+        {
+            var dbSkill = _dbContext.Skills.Find(id);
+            _dbContext.Skills.Remove(dbSkill);
+            return _dbContext.SaveChanges() > 0;
+        }
     }
 }

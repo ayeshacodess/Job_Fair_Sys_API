@@ -19,12 +19,14 @@ namespace Job_Fair_Sys_API.Controllers
         private readonly CompanyRepository _companyRespository;
         private readonly StudentSelectedCompanyRepository _studentSelectedCompanyRepository;
         private readonly AccountRepository _accountRepository;
+        private readonly StudentRepository _studentRepository;
 
         public CompanyController()
         {
             _studentSelectedCompanyRepository = new StudentSelectedCompanyRepository();
             _companyRespository = new CompanyRepository();
             _accountRepository = new AccountRepository();
+            _studentRepository = new StudentRepository();
         }
 
         [HttpGet]
@@ -33,7 +35,8 @@ namespace Job_Fair_Sys_API.Controllers
         {
             try
             {
-                var models = role == "Student" ? GetCompaniesForStudent(userId) : GetCompaniesDataByRole(role);
+                //var models = role == "Student" ? GetCompaniesForStudent(userId) : GetCompaniesDataByRole(role,userId);
+                var models = GetCompaniesDataByRole(role, userId);
                 return Request.CreateResponse(HttpStatusCode.OK, models);
             }
             catch (Exception ex)
@@ -164,11 +167,19 @@ namespace Job_Fair_Sys_API.Controllers
                 _companyRespository.DbContext.Entry(company).CurrentValues.SetValues(company);
                 _companyRespository.SaveChanges();
 
-                var updatedCompanies = GetCompaniesDataByRole("Admin");
+                var updatedCompanies = GetCompaniesDataByRole("Admin",companyId);
                 var dbUser = _accountRepository.IsAuthorizedUser(company.Email, company.Contact1);
-                
+
+
+                 if (status == "Accept" && dbUser != null)
+                {
+                    #region Accept to accept
+                    return Request.CreateResponse(HttpStatusCode.OK, updatedCompanies);
+                    #endregion End!
+                }
+
                 //pending to accept
-                if (status == "Accept" && dbUser is null)
+                else if(status == "Accept" && dbUser is null)
                 {
                     #region pending to accept
                     var user = new User
@@ -181,20 +192,24 @@ namespace Job_Fair_Sys_API.Controllers
                     _companyRespository.AddUser(user);
                     #endregion End!
                 }
-                else if (status == "Reject" && dbUser != null)
-                {
-                    #region accept to reject
-                    _accountRepository.RemoveUser(u);
-                    string v = _companyRespository.AcceptToRemoveCompany(u);
-                    #endregion End!
-                }
                 else if (status == "Reject" && dbUser == null)
                 {
                     #region Pending to reject
-
-                    string v = _companyRespository.PendingToRemoveCompany(companyId);
+                    return Request.CreateResponse(HttpStatusCode.OK, updatedCompanies);
+                    // string v = _companyRespository.PendingToRemoveCompany(companyId);
                     #endregion End!
                 }
+                else if (status == "Reject" && dbUser != null)      //apko dikhana chah rae the k accept reject k button py nai
+                    //hota blank nd student company select krta h wahan b select unselect k button py nai hota blank
+                {
+                    #region accept to reject
+                    _accountRepository.RemoveUser(u);
+                    return Request.CreateResponse(HttpStatusCode.OK, updatedCompanies);
+                    // string v = _companyRespository.AcceptToRemoveCompany(u);
+                    #endregion End!
+                }
+             
+                
                 else { 
                     return Request.CreateResponse(HttpStatusCode.BadRequest, "Please Click again!");
                 } 
@@ -238,29 +253,73 @@ namespace Job_Fair_Sys_API.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, acceptedCompanies);
         }
 
-        private List<CompanyViewModel> GetCompaniesDataByRole(string role)
+        private List<CompanyViewModel> GetCompaniesDataByRole(string role, int id)
         {
+            //related companiries..
             var companies = _companyRespository.GetCompanies();
+            List<CompanyViewModel> Result = new List<CompanyViewModel>();
+            var companiesSkills = _companyRespository.GetCompanyRequiredSkills();
+
             if (role == "Student")
             {
-                companies = companies.Where(c => c.Status == "Accept").ToList();
+                var skills = _companyRespository.GetAllskill();
+                var Studentskills = _companyRespository.GetStudentSkills(id);
+                var student = _studentRepository.GetStudent(id);
+                if (companies.Count > 0)
+                {
+                    foreach (var cm in companies)
+                    {
+                        if (companiesSkills.Count > 0)
+                        {
+                            foreach (var cS in companiesSkills)
+                            {
+                                if (cm.Id == cS.CompanyId && cm.Status== "Accept")
+                                {
+                                    if (Studentskills.Count > 0)
+                                    {
+                                        foreach (var skill in Studentskills)
+                                        {
+                                            if (skill.Skill_Id == cS.Skill_Id)
+                                            {
+                                                var ViewModelTypeCompany = CompanyViewModel.ToViewModel(cm); //convert a company into CompanyViewModel type
+                                                Result.Add(ViewModelTypeCompany);
+
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                }
             }
-
-            var models = new List<CompanyViewModel>();
-
-            foreach (var item in companies)
+            else
             {
-                var ViewModelTypeCompany = CompanyViewModel.ToViewModel(item); //convert a company into CompanyViewModel type
-                models.Add(ViewModelTypeCompany);
-            }
+                foreach (var item in companies)
+                {
+                    var ViewModelTypeCompany = CompanyViewModel.ToViewModel(item); //convert a company into CompanyViewModel type
+                    Result.Add(ViewModelTypeCompany);
+                }
+            } 
 
-            return models;
+
+            //var models = new List<CompanyViewModel>();
+
+            //foreach (var item in companies)
+            //{
+            //    var ViewModelTypeCompany = CompanyViewModel.ToViewModel(item); //convert a company into CompanyViewModel type
+            //    models.Add(ViewModelTypeCompany);
+            //}
+
+            return Result;
         }
 
         //method to show on frontend companies listview to students 
+
         private List<CompanyViewModel> GetCompaniesForStudent(int studentId) 
         {
-            var companies = GetCompaniesDataByRole("Student");
+            var companies = GetCompaniesDataByRole("Student",studentId);
 
             var studentSlectedCompanies = _studentSelectedCompanyRepository.GetStudentSelectedCompanies(studentId);
 
@@ -275,7 +334,11 @@ namespace Job_Fair_Sys_API.Controllers
                 }
             }
 
+
+
             return companies;
         }
+
+      
     }
 }

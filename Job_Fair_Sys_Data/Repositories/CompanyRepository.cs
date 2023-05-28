@@ -101,6 +101,24 @@ namespace Job_Fair_Sys_Data.Repositories
 
         }
 
+        public List<Skill> GetAllskill()
+        {
+            
+            var skills = _dbContext.Skills.ToList();
+            return skills;
+        }
+
+        public List<CompanyRequiredSkill> GetCompanyRequiredSkills()
+        {
+            var res = _dbContext.CompanyRequiredSkills.ToList();
+            return res;
+        }
+
+        public List<StudentSkill> GetStudentSkills(int id)
+        {
+            var students = _dbContext.StudentSkills.Where(e => e.StudentId == id).ToList();
+            return students;
+        }
 
     }
 }
