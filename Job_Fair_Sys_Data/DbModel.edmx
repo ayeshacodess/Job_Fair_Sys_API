@@ -54,8 +54,8 @@
           <Property Name="SocietyMemberId" Type="int" Nullable="false" />
           <Property Name="Date" Type="datetime" Nullable="false" />
           <Property Name="TimeDuration" Type="int" Nullable="false" />
-          <Property Name="StartTime" Type="nvarchar" MaxLength="50" />
-          <Property Name="EndTime" Type="nvarchar" MaxLength="50" />
+          <Property Name="StartTime" Type="datetime" />
+          <Property Name="EndTime" Type="datetime" />
           <Property Name="Interviewed" Type="bit" Nullable="false" />
           <Property Name="Description" Type="nvarchar(max)" />
           <Property Name="AllocatedRoom" Type="nvarchar" MaxLength="30" />
@@ -580,8 +580,8 @@
           <Property Name="SocietyMemberId" Type="Int32" Nullable="false" />
           <Property Name="Date" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="TimeDuration" Type="Int32" Nullable="false" />
-          <Property Name="StartTime" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="EndTime" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="StartTime" Type="DateTime" Precision="3" />
+          <Property Name="EndTime" Type="DateTime" Precision="3" />
           <Property Name="Interviewed" Type="Boolean" Nullable="false" />
           <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="AllocatedRoom" Type="String" MaxLength="30" FixedLength="false" Unicode="true" />

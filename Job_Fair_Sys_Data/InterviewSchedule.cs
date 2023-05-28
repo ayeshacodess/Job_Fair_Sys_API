@@ -20,8 +20,8 @@ namespace Job_Fair_Sys_Data
         public int SocietyMemberId { get; set; }
         public System.DateTime Date { get; set; }
         public int TimeDuration { get; set; }
-        public string StartTime { get; set; }
-        public string EndTime { get; set; }
+        public Nullable<System.DateTime> StartTime { get; set; }
+        public Nullable<System.DateTime> EndTime { get; set; }
         public bool Interviewed { get; set; }
         public string Description { get; set; }
         public string AllocatedRoom { get; set; }

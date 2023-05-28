@@ -39,38 +39,44 @@ namespace Job_Fair_Sys_API.Controllers
 
                   var ob = JsonConvert.DeserializeObject<GenerateScheduleViewModel>(requestBody);
 
-        //            List<InterviewSchedule> schedule = new List<InterviewSchedule>();
-        //            List<StudentSelectedCompany> students = _scheduleRepository.GetStudents(ob.);
-        //            var company = _companyRespository.GetCompany(ob.companyId);
-        //            var CompanyTime = company.TimeSlot;
-        //            var comTime = company.TimeSlot;
-        //            TimeSpan startTime9 = TimeSpan.FromHours(9);
-        //            TimeSpan startTime12 = TimeSpan.FromHours(12);
-        //            TimeSpan timeDuration = TimeSpan.FromMinutes(ob.timeDuration);
-        //            TimeSpan endTime;
-        //            foreach (var s in students)
-        //            {
-        //                schedule.Add(new InterviewSchedule
-        //                {
-        //                    StudentId = s.Student_Id,
-        //                    CompanyId = ob.companyId,
-        //                    SocietyMemberId = ob.societyMemberId,
-        //                    Date = DateTime.Now,
-        //                    TimeDuration = ob.timeDuration,
-        //                    AllocatedRoom = ob.allocatedRoom,
-        //                    StartTime = "9:00",
-        //                    EndTime = "9:10",
-    
-        //            });
-        //                _scheduleRepository.AddSchedule(schedule);
-        //            }
-                   return Request.CreateResponse(HttpStatusCode.OK, ob);
-              }
-               catch (Exception ex)
-               {
-                   return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
-              }
-           }
+                    //List<InterviewSchedule> schedule = new List<InterviewSchedule>();
+                    //List<StudentSelectedCompany> students = _scheduleRepository.GetStudents(ob.selectedCompany);
+                    //var company = _companyRespository.GetCompany(ob.selectedCompany);
+                    //var CompanyTime = company.TimeSlot;
+                    //var comTime = company.TimeSlot;
+                    //TimeSpan startTime9 = TimeSpan.FromHours(9);
+                    //TimeSpan startTime12 = TimeSpan.FromHours(12);
+                    //TimeSpan timeDuration = TimeSpan.FromMinutes(ob.timeDuration);
+                    //TimeSpan endTime;
+                    //foreach (var s in students)
+                    //{
+                    //    schedule.Add(new InterviewSchedule
+                    //    {
+                    //        StudentId = s.Student_Id,
+                    //        CompanyId = ob.selectedCompany,
+                    //        SocietyMemberId = ob.UserProfile,
+                    //        Date = DateTime.Now,
+                    //        TimeDuration = ob.timeDuration,
+                    //        AllocatedRoom = ob.allocatedRoom,
+                    //       if (comTime == startTime9)
+                    //    {
+
+                    //    }
+                    //    if (comTime == startTime12)
+                    //    {
+
+                    //    }
+
+                    //});
+                    //    _scheduleRepository.AddSchedule(schedule);
+                    return Request.CreateResponse(HttpStatusCode.OK, ob);
+                }
+                    
+                  catch (Exception ex)
+                {
+                    return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+                }
+            }
         }
     }
 }
