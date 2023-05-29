@@ -18,13 +18,14 @@ namespace Job_Fair_Sys_API.Controllers
     {
         private readonly ScheduleRepository _scheduleRepository;
         private readonly CompanyRepository _companyRespository;
+
         public ScheduleController()
         {
             _scheduleRepository = new ScheduleRepository();
             _companyRespository = new CompanyRepository();
         }
 
-        //role, userid...get schedule
+        
         [HttpGet]
         [Route("api/schedule/get")]
         public HttpResponseMessage Get(string role, int userId)
@@ -32,11 +33,54 @@ namespace Job_Fair_Sys_API.Controllers
             try
             {
                 //schedule
-                //companies
-                //students
+                var schedule = _scheduleRepository.GetSchedules();
 
+                if (role == "Student")
+                    schedule = schedule.Where(x => x.StudentId == userId).ToList();
+                else if (role == "Company")
+                    schedule = schedule.Where(x => x.CompanyId == userId).ToList();
 
-                return Request.CreateResponse(HttpStatusCode.OK);
+                var students = _scheduleRepository.DbContext.Students.ToList();
+                var companies = _scheduleRepository.DbContext.Companies.Where(c => c.Status == "Accept").ToList();
+
+                var models = new List<ScheduleViewModel>();
+
+                foreach (var item in schedule)
+                {
+                    var student = students.FirstOrDefault(s => s.Id == item.StudentId);
+                    var company = companies.FirstOrDefault(c => c.Id == item.CompanyId);
+
+                    var model = new ScheduleViewModel();
+
+                    model.id = item.Id;
+                    
+                    model.studentId = student.Id;   
+                    model.studentName = student.Name;
+                    model.aridNumber = student.AridNumber;
+                    model.companyId = company.Id;
+                    model.compnayName = company.Name;
+                    model.date = item.Date;
+                    model.startTime = item.StartTime;
+                    model.endTime = item.EndTime;
+                    model.interviewed = item.Interviewed;
+                    model.description = item.Description;
+                    model.allocatedRoom = item.AllocatedRoom;
+
+                    if (role == "Admin")
+                    {
+                        model.createorId = item.AdminId ?? 0;
+                        model.creatorRole = "Admin";
+                    } 
+                    else if (role == "SocietyMember")
+                    {
+                        model.createorId = item.SocietyMemberId ?? 0;
+                        model.creatorRole = "SocietMember";
+                    }
+
+                    models.Add(model);
+                }
+
+                return Request.CreateResponse(HttpStatusCode.OK, models);
             }
             catch (Exception ex)
             {
@@ -58,47 +102,50 @@ namespace Job_Fair_Sys_API.Controllers
 
                     //-------------------------
                     var company = _companyRespository.GetCompany(reqModel.selectedCompany);
+                    if (company != null)
+                    {
+                        var startTime = GetCompanyStartTimeByTimeSlot(company.TimeSlot ?? 0);
+                        var students = _scheduleRepository.GetStudents(company.Id);
 
-                    var startTime = GetCompanyStartTimeByTimeSlot(company.TimeSlot ?? 0);
-                    var students = _scheduleRepository.GetStudents(company.Id);
-
-                    if (startTime != null) {
-                        List<InterviewSchedule> schedules = new List<InterviewSchedule>();
-
-                        foreach (var std in students)
+                        if (startTime != null)
                         {
-                            var scd = new InterviewSchedule();
+                            List<InterviewSchedule> schedules = new List<InterviewSchedule>();
 
-                            var scheduleStartTime = new DateTime(startTime.Value.Year, startTime.Value.Month, startTime.Value.Day, startTime.Value.Hour, startTime.Value.Minute, startTime.Value.Second);
-                            var scheduleEndTime = new DateTime(startTime.Value.Year, startTime.Value.Month, startTime.Value.Day, startTime.Value.Hour, startTime.Value.Minute, startTime.Value.Second);
-                            scheduleEndTime = scheduleEndTime.AddMinutes(reqModel.timeDuration);
+                            foreach (var std in students)
+                            {
+                                var scd = new InterviewSchedule();
 
-                            scd.StudentId = std.Student_Id;
-                            scd.CompanyId = company.Id;
+                                var scheduleStartTime = new DateTime(startTime.Value.Year, startTime.Value.Month, startTime.Value.Day, startTime.Value.Hour, startTime.Value.Minute, startTime.Value.Second);
+                                var scheduleEndTime = new DateTime(startTime.Value.Year, startTime.Value.Month, startTime.Value.Day, startTime.Value.Hour, startTime.Value.Minute, startTime.Value.Second);
+                                scheduleEndTime = scheduleEndTime.AddMinutes(reqModel.timeDuration);
 
-                            if (reqModel.role == "SocietyMember")
-                                scd.SocietyMemberId = reqModel.UserProfile;
+                                scd.StudentId = std.Student_Id;
+                                scd.CompanyId = company.Id;
 
-                            if (reqModel.role == "Admin")
-                                scd.AdminId = reqModel.UserProfile;
+                                if (reqModel.role == "SocietyMember")
+                                    scd.SocietyMemberId = reqModel.UserProfile;
 
-                            scd.AllocatedRoom = reqModel.allocatedRoom;
-                            scd.StartTime = scheduleStartTime;
-                            scd.EndTime = scheduleEndTime;
-                            scd.Interviewed = false;
-                            scd.Date = DateTime.Now;
+                                if (reqModel.role == "Admin")
+                                    scd.AdminId = reqModel.UserProfile;
 
-                            startTime = scheduleEndTime;
+                                scd.AllocatedRoom = reqModel.allocatedRoom;
+                                scd.StartTime = scheduleStartTime;
+                                scd.EndTime = scheduleEndTime;
+                                scd.Interviewed = false;
+                                scd.Date = DateTime.Now;
 
-                            schedules.Add(scd);
+                                startTime = scheduleEndTime;
+
+                                schedules.Add(scd);
+                            }
+
+                            _scheduleRepository.AddSchedules(schedules);
                         }
 
-                        _scheduleRepository.AddSchedules(schedules);
+                        return Request.CreateResponse(HttpStatusCode.OK, reqModel);
                     }
-
-                    return Request.CreateResponse(HttpStatusCode.OK, reqModel);
+                    return Request.CreateResponse(HttpStatusCode.NotFound, "Company Not found.");
                 }
-                    
                   catch (Exception ex)
                 {
                     return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);

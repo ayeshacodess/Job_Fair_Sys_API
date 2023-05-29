@@ -53,6 +53,11 @@ namespace Job_Fair_Sys_Data.Repositories
                 {
                     _dbContext.StudentSelectedCompanies.Remove(item);
                 }
+                var st = _dbContext.InterviewSchedules.Where(s => s.StudentId == student.Id);
+                foreach (var item in st)
+                {
+                    _dbContext.InterviewSchedules.Remove(item);
+                }
                 _dbContext.Students.Remove(student);
                 _dbContext.SaveChanges();
                 return "Successfully Deleted!";

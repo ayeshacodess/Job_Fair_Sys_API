@@ -22,6 +22,11 @@ namespace Job_Fair_Sys_Data.Repositories
             return result;
         }
 
+        public Skill Get(int id)
+        {
+            return _dbContext.Skills.Find(id);
+        }
+
         public bool Update(Skill skill)
         {
             var dbSkill = _dbContext.Skills.Find(skill.Id);

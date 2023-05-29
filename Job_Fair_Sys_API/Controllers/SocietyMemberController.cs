@@ -65,7 +65,7 @@ namespace Job_Fair_Sys_API.Controllers
                     {
                         Username = member.email,
                         Password = "abc@123",
-                        Role = "Society Member"
+                        Role = "SocietyMember"
                     };
                     _companyRespository.AddUser(user);
                     return Request.CreateResponse(HttpStatusCode.OK, member);

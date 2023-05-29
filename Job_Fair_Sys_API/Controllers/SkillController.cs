@@ -8,6 +8,10 @@ using System.Web.Http;
 using Job_Fair_Sys_Data;
 using Job_Fair_Sys_API.Models;
 using Microsoft.Ajax.Utilities;
+using System.IO;
+using System.Web;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace Job_Fair_Sys_API.Controllers
 {
@@ -31,18 +35,38 @@ namespace Job_Fair_Sys_API.Controllers
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
-        [Route("api/addSkills")]
+
+        [Route("api/skill/addupdate")]
         [HttpPost]
-        public HttpResponseMessage AddSkill(Skill skill)
+        public async Task<HttpResponseMessage> AddSkill()
         {
-            try
+            using (var reader = new StreamReader(await Request.Content.ReadAsStreamAsync()))
             {
-                var add_skill = _skillRepository.Add(skill);
-                return Request.CreateResponse(HttpStatusCode.OK, add_skill);
-            }
-            catch (Exception ex)
-            {
-                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+                try
+                {
+                    string requestBody = reader.ReadToEnd();
+                    var skill = JsonConvert.DeserializeObject<Skill>(requestBody);
+                    
+                    if (skill.Id > 0)
+                    {
+                        var skillToUpdate = _skillRepository.Get(skill.Id);
+                        if (skillToUpdate != null)
+                        {
+                            skillToUpdate.Technology = skill.Technology;
+                            _skillRepository.Update(skillToUpdate);
+                        }
+                    }
+                    else 
+                    {
+                        _skillRepository.Add(skill);
+                    }
+
+                    return Request.CreateResponse(HttpStatusCode.OK);
+                }
+                catch (Exception ex)
+                {
+                    return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+                }
             }
         }
 

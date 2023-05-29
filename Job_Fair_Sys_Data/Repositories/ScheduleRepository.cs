@@ -10,9 +10,15 @@ namespace Job_Fair_Sys_Data.Repositories
         {
         }
 
+        public List<InterviewSchedule> GetSchedules()
+        {
+            var scd = _dbContext.InterviewSchedules.ToList();
+            return scd;
+        }
+
         public List<StudentSelectedCompany> GetStudents(int companyId)
         {
-            var students = _dbContext.StudentSelectedCompanies.Where(x =>  x.co);
+            var students = _dbContext.StudentSelectedCompanies.Where(x =>  x.Company_Id == companyId).ToList();
             return students;
         }
 
