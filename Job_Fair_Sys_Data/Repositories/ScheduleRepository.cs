@@ -46,5 +46,15 @@ namespace Job_Fair_Sys_Data.Repositories
                 _dbContext.SaveChanges();
             }
         }
+
+        public void GetRecordAndAddInterviewed(bool isInterviewed, int studentId, int companyId, int scheduleid)
+        {
+            var record = _dbContext.InterviewSchedules.FirstOrDefault(x => x.StudentId == studentId && x.CompanyId == companyId && x.Id == scheduleid);
+            if (record != null)
+            {
+                record.Interviewed = isInterviewed;
+                _dbContext.SaveChanges();
+            }
+        }
     }
 }

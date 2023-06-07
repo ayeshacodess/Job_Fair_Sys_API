@@ -40,6 +40,21 @@ namespace Job_Fair_Sys_API.Controllers
             }
             
         }
+        [HttpGet]
+        [Route("api/schedule/interviewed")]
+        public HttpResponseMessage StudentInterviewed(bool isInterviewed, int studentId, int companyId, int scheduleId)
+        {
+            try
+            {
+                _scheduleRepository.GetRecordAndAddInterviewed(isInterviewed, studentId, companyId, scheduleId);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+
+        }
 
         [HttpGet]
         [Route("api/schedule/get")]
@@ -155,7 +170,7 @@ namespace Job_Fair_Sys_API.Controllers
                                 scd.EndTime = scheduleEndTime;
                                 scd.Interviewed = false;
                                 scd.Date = DateTime.Now;
-
+                                scd.TimeDuration = reqModel.timeDuration;
                                 startTime = scheduleEndTime;
 
                                 schedules.Add(scd);
