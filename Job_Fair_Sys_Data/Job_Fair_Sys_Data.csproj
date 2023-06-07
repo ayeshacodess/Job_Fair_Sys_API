@@ -73,9 +73,6 @@
     <Compile Include="EventFeedback.cs">
       <DependentUpon>DbModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="FeedBack.cs">
-      <DependentUpon>DbModel.tt</DependentUpon>
-    </Compile>
     <Compile Include="InterviewSchedule.cs">
       <DependentUpon>DbModel.tt</DependentUpon>
     </Compile>

@@ -18,6 +18,7 @@ namespace Job_Fair_Sys_Data
         {
             this.CompanyRequiredSkills = new HashSet<CompanyRequiredSkill>();
             this.StudentSkills = new HashSet<StudentSkill>();
+            this.StudentsFeedbacks = new HashSet<StudentsFeedback>();
         }
     
         public int Id { get; set; }
@@ -25,5 +26,6 @@ namespace Job_Fair_Sys_Data
     
         public virtual ICollection<CompanyRequiredSkill> CompanyRequiredSkills { get; set; }
         public virtual ICollection<StudentSkill> StudentSkills { get; set; }
+        public virtual ICollection<StudentsFeedback> StudentsFeedbacks { get; set; }
     }
 }

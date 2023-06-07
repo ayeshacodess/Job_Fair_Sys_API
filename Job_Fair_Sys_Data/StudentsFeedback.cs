@@ -17,11 +17,11 @@ namespace Job_Fair_Sys_Data
         public int Id { get; set; }
         public Nullable<int> StudentId { get; set; }
         public Nullable<int> CompanyId { get; set; }
-        public Nullable<int> FeedBackId { get; set; }
         public Nullable<int> rate { get; set; }
+        public Nullable<int> Skill_ld { get; set; }
     
         public virtual Company Company { get; set; }
-        public virtual FeedBack FeedBack { get; set; }
+        public virtual Skill Skill { get; set; }
         public virtual Student Student { get; set; }
     }
 }

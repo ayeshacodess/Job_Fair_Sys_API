@@ -37,13 +37,6 @@
           <Property Name="Feedback" Type="nvarchar(max)" />
           <Property Name="CompanyId" Type="int" Nullable="false" />
         </EntityType>
-        <EntityType Name="FeedBack">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="FeedBack" Type="nvarchar" MaxLength="50" />
-        </EntityType>
         <EntityType Name="InterviewSchedule">
           <Key>
             <PropertyRef Name="Id" />
@@ -116,8 +109,8 @@
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="StudentId" Type="int" />
           <Property Name="CompanyId" Type="int" />
-          <Property Name="FeedBackId" Type="int" />
           <Property Name="rate" Type="int" />
+          <Property Name="Skill_ld" Type="int" />
         </EntityType>
         <EntityType Name="StudentSkill">
           <Key>
@@ -339,15 +332,15 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_StudentsFeedback_FeedBack">
-          <End Role="FeedBack" Type="Self.FeedBack" Multiplicity="0..1" />
+        <Association Name="FK_StudentsFeedback_Skill">
+          <End Role="Skill" Type="Self.Skill" Multiplicity="0..1" />
           <End Role="StudentsFeedback" Type="Self.StudentsFeedback" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="FeedBack">
+            <Principal Role="Skill">
               <PropertyRef Name="Id" />
             </Principal>
             <Dependent Role="StudentsFeedback">
-              <PropertyRef Name="FeedBackId" />
+              <PropertyRef Name="Skill_ld" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -367,7 +360,6 @@
           <EntitySet Name="Company" EntityType="Self.Company" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="CompanyRequiredSkill" EntityType="Self.CompanyRequiredSkill" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="EventFeedback" EntityType="Self.EventFeedback" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="FeedBack" EntityType="Self.FeedBack" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="InterviewSchedule" EntityType="Self.InterviewSchedule" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Skill" EntityType="Self.Skill" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SocietyMember" EntityType="Self.SocietyMember" Schema="dbo" store:Type="Tables" />
@@ -441,8 +433,8 @@
             <End Role="Company" EntitySet="Company" />
             <End Role="StudentsFeedback" EntitySet="StudentsFeedback" />
           </AssociationSet>
-          <AssociationSet Name="FK_StudentsFeedback_FeedBack" Association="Self.FK_StudentsFeedback_FeedBack">
-            <End Role="FeedBack" EntitySet="FeedBack" />
+          <AssociationSet Name="FK_StudentsFeedback_Skill" Association="Self.FK_StudentsFeedback_Skill">
+            <End Role="Skill" EntitySet="Skill" />
             <End Role="StudentsFeedback" EntitySet="StudentsFeedback" />
           </AssociationSet>
           <AssociationSet Name="FK_StudentsFeedback_Student" Association="Self.FK_StudentsFeedback_Student">
@@ -458,13 +450,11 @@
           <EntitySet Name="Companies" EntityType="DbModel.Company" />
           <EntitySet Name="CompanyRequiredSkills" EntityType="DbModel.CompanyRequiredSkill" />
           <EntitySet Name="EventFeedbacks" EntityType="DbModel.EventFeedback" />
-          <EntitySet Name="FeedBacks" EntityType="DbModel.FeedBack" />
           <EntitySet Name="InterviewSchedules" EntityType="DbModel.InterviewSchedule" />
           <EntitySet Name="Skills" EntityType="DbModel.Skill" />
           <EntitySet Name="SocietyMembers" EntityType="DbModel.SocietyMember" />
           <EntitySet Name="Students" EntityType="DbModel.Student" />
           <EntitySet Name="StudentSelectedCompanies" EntityType="DbModel.StudentSelectedCompany" />
-          <EntitySet Name="StudentsFeedbacks" EntityType="DbModel.StudentsFeedback" />
           <EntitySet Name="StudentSkills" EntityType="DbModel.StudentSkill" />
           <EntitySet Name="sysdiagrams" EntityType="DbModel.sysdiagram" />
           <EntitySet Name="Users" EntityType="DbModel.User" />
@@ -492,17 +482,9 @@
             <End Role="Company" EntitySet="Companies" />
             <End Role="StudentSelectedCompany" EntitySet="StudentSelectedCompanies" />
           </AssociationSet>
-          <AssociationSet Name="FK_StudentsFeedback_Company" Association="DbModel.FK_StudentsFeedback_Company">
-            <End Role="Company" EntitySet="Companies" />
-            <End Role="StudentsFeedback" EntitySet="StudentsFeedbacks" />
-          </AssociationSet>
           <AssociationSet Name="FK_CompanyRequiredSkill_Skill" Association="DbModel.FK_CompanyRequiredSkill_Skill">
             <End Role="Skill" EntitySet="Skills" />
             <End Role="CompanyRequiredSkill" EntitySet="CompanyRequiredSkills" />
-          </AssociationSet>
-          <AssociationSet Name="FK_StudentsFeedback_FeedBack" Association="DbModel.FK_StudentsFeedback_FeedBack">
-            <End Role="FeedBack" EntitySet="FeedBacks" />
-            <End Role="StudentsFeedback" EntitySet="StudentsFeedbacks" />
           </AssociationSet>
           <AssociationSet Name="FK_InterviewSchedule_SocietyMember" Association="DbModel.FK_InterviewSchedule_SocietyMember">
             <End Role="SocietyMember" EntitySet="SocietyMembers" />
@@ -535,6 +517,15 @@
           <AssociationSet Name="FK_StudentSelectedCompanies_Student" Association="DbModel.FK_StudentSelectedCompanies_Student">
             <End Role="Student" EntitySet="Students" />
             <End Role="StudentSelectedCompany" EntitySet="StudentSelectedCompanies" />
+          </AssociationSet>
+          <EntitySet Name="StudentsFeedbacks" EntityType="DbModel.StudentsFeedback" />
+          <AssociationSet Name="FK_StudentsFeedback_Company" Association="DbModel.FK_StudentsFeedback_Company">
+            <End Role="Company" EntitySet="Companies" />
+            <End Role="StudentsFeedback" EntitySet="StudentsFeedbacks" />
+          </AssociationSet>
+          <AssociationSet Name="FK_StudentsFeedback_Skill" Association="DbModel.FK_StudentsFeedback_Skill">
+            <End Role="Skill" EntitySet="Skills" />
+            <End Role="StudentsFeedback" EntitySet="StudentsFeedbacks" />
           </AssociationSet>
           <AssociationSet Name="FK_StudentsFeedback_Student" Association="DbModel.FK_StudentsFeedback_Student">
             <End Role="Student" EntitySet="Students" />
@@ -584,14 +575,6 @@
           <Property Name="CompanyId" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Company" Relationship="DbModel.FK_EventFeedback_Company" FromRole="EventFeedback" ToRole="Company" />
         </EntityType>
-        <EntityType Name="FeedBack">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="FeedBack1" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="StudentsFeedbacks" Relationship="DbModel.FK_StudentsFeedback_FeedBack" FromRole="FeedBack" ToRole="StudentsFeedback" />
-        </EntityType>
         <EntityType Name="InterviewSchedule">
           <Key>
             <PropertyRef Name="Id" />
@@ -622,6 +605,7 @@
           <Property Name="Technology" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="CompanyRequiredSkills" Relationship="DbModel.FK_CompanyRequiredSkill_Skill" FromRole="Skill" ToRole="CompanyRequiredSkill" />
           <NavigationProperty Name="StudentSkills" Relationship="DbModel.FK_CompanyStudentSkill_Skill" FromRole="Skill" ToRole="StudentSkill" />
+          <NavigationProperty Name="StudentsFeedbacks" Relationship="DbModel.FK_StudentsFeedback_Skill" FromRole="Skill" ToRole="StudentsFeedback" />
         </EntityType>
         <EntityType Name="SocietyMember">
           <Key>
@@ -671,19 +655,6 @@
           <Property Name="DummyColumn" Type="Boolean" />
           <NavigationProperty Name="Company" Relationship="DbModel.FK_StudentSelectedCompanies_Company1" FromRole="StudentSelectedCompany" ToRole="Company" />
           <NavigationProperty Name="Student" Relationship="DbModel.FK_StudentSelectedCompanies_Student" FromRole="StudentSelectedCompany" ToRole="Student" />
-        </EntityType>
-        <EntityType Name="StudentsFeedback">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="StudentId" Type="Int32" />
-          <Property Name="CompanyId" Type="Int32" />
-          <Property Name="FeedBackId" Type="Int32" />
-          <Property Name="rate" Type="Int32" />
-          <NavigationProperty Name="Company" Relationship="DbModel.FK_StudentsFeedback_Company" FromRole="StudentsFeedback" ToRole="Company" />
-          <NavigationProperty Name="FeedBack" Relationship="DbModel.FK_StudentsFeedback_FeedBack" FromRole="StudentsFeedback" ToRole="FeedBack" />
-          <NavigationProperty Name="Student" Relationship="DbModel.FK_StudentsFeedback_Student" FromRole="StudentsFeedback" ToRole="Student" />
         </EntityType>
         <EntityType Name="StudentSkill">
           <Key>
@@ -791,18 +762,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_StudentsFeedback_Company">
-          <End Type="DbModel.Company" Role="Company" Multiplicity="0..1" />
-          <End Type="DbModel.StudentsFeedback" Role="StudentsFeedback" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Company">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="StudentsFeedback">
-              <PropertyRef Name="CompanyId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_CompanyRequiredSkill_Skill">
           <End Type="DbModel.Skill" Role="Skill" Multiplicity="1" />
           <End Type="DbModel.CompanyRequiredSkill" Role="CompanyRequiredSkill" Multiplicity="*" />
@@ -812,18 +771,6 @@
             </Principal>
             <Dependent Role="CompanyRequiredSkill">
               <PropertyRef Name="Skill_Id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_StudentsFeedback_FeedBack">
-          <End Type="DbModel.FeedBack" Role="FeedBack" Multiplicity="0..1" />
-          <End Type="DbModel.StudentsFeedback" Role="StudentsFeedback" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="FeedBack">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="StudentsFeedback">
-              <PropertyRef Name="FeedBackId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -923,6 +870,43 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="StudentsFeedback">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="StudentId" Type="Int32" />
+          <Property Name="CompanyId" Type="Int32" />
+          <Property Name="rate" Type="Int32" />
+          <Property Name="Skill_ld" Type="Int32" />
+          <NavigationProperty Name="Company" Relationship="DbModel.FK_StudentsFeedback_Company" FromRole="StudentsFeedback" ToRole="Company" />
+          <NavigationProperty Name="Skill" Relationship="DbModel.FK_StudentsFeedback_Skill" FromRole="StudentsFeedback" ToRole="Skill" />
+          <NavigationProperty Name="Student" Relationship="DbModel.FK_StudentsFeedback_Student" FromRole="StudentsFeedback" ToRole="Student" />
+        </EntityType>
+        <Association Name="FK_StudentsFeedback_Company">
+          <End Type="DbModel.Company" Role="Company" Multiplicity="0..1" />
+          <End Type="DbModel.StudentsFeedback" Role="StudentsFeedback" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Company">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="StudentsFeedback">
+              <PropertyRef Name="CompanyId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_StudentsFeedback_Skill">
+          <End Type="DbModel.Skill" Role="Skill" Multiplicity="0..1" />
+          <End Type="DbModel.StudentsFeedback" Role="StudentsFeedback" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Skill">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="StudentsFeedback">
+              <PropertyRef Name="Skill_ld" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_StudentsFeedback_Student">
           <End Type="DbModel.Student" Role="Student" Multiplicity="0..1" />
           <End Type="DbModel.StudentsFeedback" Role="StudentsFeedback" Multiplicity="*" />
@@ -972,14 +956,6 @@
               <MappingFragment StoreEntitySet="EventFeedback">
                 <ScalarProperty Name="CompanyId" ColumnName="CompanyId" />
                 <ScalarProperty Name="Feedback" ColumnName="Feedback" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="FeedBacks">
-            <EntityTypeMapping TypeName="DbModel.FeedBack">
-              <MappingFragment StoreEntitySet="FeedBack">
-                <ScalarProperty Name="FeedBack1" ColumnName="FeedBack" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -1054,17 +1030,6 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="StudentsFeedbacks">
-            <EntityTypeMapping TypeName="DbModel.StudentsFeedback">
-              <MappingFragment StoreEntitySet="StudentsFeedback">
-                <ScalarProperty Name="rate" ColumnName="rate" />
-                <ScalarProperty Name="FeedBackId" ColumnName="FeedBackId" />
-                <ScalarProperty Name="CompanyId" ColumnName="CompanyId" />
-                <ScalarProperty Name="StudentId" ColumnName="StudentId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="StudentSkills">
             <EntityTypeMapping TypeName="DbModel.StudentSkill">
               <MappingFragment StoreEntitySet="StudentSkill">
@@ -1092,6 +1057,17 @@
                 <ScalarProperty Name="Role" ColumnName="Role" />
                 <ScalarProperty Name="Password" ColumnName="Password" />
                 <ScalarProperty Name="Username" ColumnName="Username" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="StudentsFeedbacks">
+            <EntityTypeMapping TypeName="DbModel.StudentsFeedback">
+              <MappingFragment StoreEntitySet="StudentsFeedback">
+                <ScalarProperty Name="Skill_ld" ColumnName="Skill_ld" />
+                <ScalarProperty Name="rate" ColumnName="rate" />
+                <ScalarProperty Name="CompanyId" ColumnName="CompanyId" />
+                <ScalarProperty Name="StudentId" ColumnName="StudentId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
