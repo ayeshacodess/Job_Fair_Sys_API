@@ -40,5 +40,11 @@ namespace Job_Fair_Sys_Data.Repositories
             _dbContext.Skills.Remove(dbSkill);
             return _dbContext.SaveChanges() > 0;
         }
+
+        public List<StudentSkill> GetStudentSkillsFromDb(string aridno)
+        {
+            var std = _dbContext.Students.FirstOrDefault(x => x.AridNumber == aridno);
+            return std.StudentSkills.ToList();
+        }
     }
 }

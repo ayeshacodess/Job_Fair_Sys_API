@@ -35,8 +35,8 @@ namespace Job_Fair_Sys_API.Controllers
         {
             try
             {
-                //var models = role == "Student" ? GetCompaniesForStudent(userId) : GetCompaniesDataByRole(role,userId);
-                var models = GetCompaniesDataByRole(role, userId);
+                var models = role == "Student" ? GetCompaniesForStudent(userId) : GetCompaniesDataByRole(role,userId);
+                //var models = GetCompaniesDataByRole(role, userId);
                 return Request.CreateResponse(HttpStatusCode.OK, models);
             }
             catch (Exception ex)
@@ -262,37 +262,17 @@ namespace Job_Fair_Sys_API.Controllers
 
             if (role == "Student")
             {
-                var skills = _companyRespository.GetAllskill();
-                var Studentskills = _companyRespository.GetStudentSkills(id);
-                var student = _studentRepository.GetStudent(id);
-                if (companies.Count > 0)
-                {
-                    foreach (var cm in companies)
+                companies = companies.Where(c => c.Status == "Accept").ToList();
+                var studentskills = _companyRespository.GetStudentSkills(id).Select(x => x.Skill_Id).ToList();
+
+                companies.ForEach(company => {    
+                    var companySkills = company.CompanyRequiredSkills.Select(x => x.Skill_Id).ToList();
+                    var isAnySkillMatch = companySkills.Intersect(studentskills).ToList();
+                    if(isAnySkillMatch.Count > 0)
                     {
-                        if (companiesSkills.Count > 0)
-                        {
-                            foreach (var cS in companiesSkills)
-                            {
-                                if (cm.Id == cS.CompanyId && cm.Status== "Accept")
-                                {
-                                    if (Studentskills.Count > 0)
-                                    {
-                                        foreach (var skill in Studentskills)
-                                        {
-                                            if (skill.Skill_Id == cS.Skill_Id)
-                                            {
-                                                var ViewModelTypeCompany = CompanyViewModel.ToViewModel(cm); //convert a company into CompanyViewModel type
-                                                Result.Add(ViewModelTypeCompany);
-
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
+                        Result.Add(CompanyViewModel.ToViewModel(company));
                     }
-                }
+                });
             }
             else
             {
@@ -333,12 +313,7 @@ namespace Job_Fair_Sys_API.Controllers
                     item.status = "Un-Selected";
                 }
             }
-
-
-
             return companies;
         }
-
-      
     }
 }

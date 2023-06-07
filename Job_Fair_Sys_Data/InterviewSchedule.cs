@@ -26,6 +26,7 @@ namespace Job_Fair_Sys_Data
         public bool Interviewed { get; set; }
         public string Description { get; set; }
         public string AllocatedRoom { get; set; }
+        public Nullable<bool> IsShortListed { get; set; }
     
         public virtual Company Company { get; set; }
         public virtual SocietyMember SocietyMember { get; set; }

@@ -29,6 +29,7 @@ namespace Job_Fair_Sys_Data
         public DbSet<CompanyRequiredSkill> CompanyRequiredSkills { get; set; }
         public DbSet<EventFeedback> EventFeedbacks { get; set; }
         public DbSet<FeedBack> FeedBacks { get; set; }
+        public DbSet<InterviewSchedule> InterviewSchedules { get; set; }
         public DbSet<Skill> Skills { get; set; }
         public DbSet<SocietyMember> SocietyMembers { get; set; }
         public DbSet<Student> Students { get; set; }
@@ -37,6 +38,5 @@ namespace Job_Fair_Sys_Data
         public DbSet<StudentSkill> StudentSkills { get; set; }
         public DbSet<sysdiagram> sysdiagrams { get; set; }
         public DbSet<User> Users { get; set; }
-        public DbSet<InterviewSchedule> InterviewSchedules { get; set; }
     }
 }

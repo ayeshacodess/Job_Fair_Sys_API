@@ -18,5 +18,7 @@ namespace Job_Fair_Sys_API.Models
         public bool interviewed { get; set; }
         public string description { get; set; }
         public string allocatedRoom { get; set; }
+        public bool isShortListed { get; set; } = false;
+
     }
 }

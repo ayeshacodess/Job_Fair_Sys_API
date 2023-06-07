@@ -36,5 +36,25 @@ namespace Job_Fair_Sys_Data.Repositories
             var students = _dbContext.InterviewSchedules.Where(x => x.SocietyMemberId == userId).ToList();
             return students;
         }
+
+        public List<InterviewSchedule> GetRecordAndAddShortList(bool isSHortlIst, int studentId, int companyId, int scheduleid)
+        {
+
+            try
+            {
+                var record = _dbContext.InterviewSchedules.Where(x => x.StudentId == studentId && x.CompanyId == companyId && x.Id == scheduleid).ToList();
+                if (record != null)
+                {
+                    //record.IsShortListed = isSHortlIst;
+                    _dbContext.SaveChanges();
+                    return record;
+                }
+            }
+            catch (Exception)
+            {
+                 throw ;
+            }
+            return null;
+        }
     }
 }

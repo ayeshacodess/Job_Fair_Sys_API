@@ -23,6 +23,7 @@ namespace Job_Fair_Sys_API.Controllers
             _skillRepository = new SkillRepository();
         }
 
+        [Route("api/skill/get")]
         public HttpResponseMessage Get()
         {
             try
@@ -98,6 +99,21 @@ namespace Job_Fair_Sys_API.Controllers
             }
 
             return skills;
+        }
+
+        [Route("api/studentSkills/get")]
+        public HttpResponseMessage GetStudentSkill(string aridno)
+        {
+            try
+            {
+                var skills = _skillRepository.GetStudentSkillsFromDb(aridno);
+                return Request.CreateResponse(HttpStatusCode.OK, skills.ToList());
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+
         }
     }
 }

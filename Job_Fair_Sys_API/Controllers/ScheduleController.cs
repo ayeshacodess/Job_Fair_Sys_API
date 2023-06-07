@@ -25,8 +25,25 @@ namespace Job_Fair_Sys_API.Controllers
             _companyRespository = new CompanyRepository();
         }
 
+
         
+
         [HttpGet]
+        [Route("api/schedule/shortlist")]
+        public HttpResponseMessage GetShortList(bool isSHortlIst, int studentId, int companyId, int scheduleid)
+        {
+            try
+            {
+                var scheduleRow = _scheduleRepository.GetRecordAndAddShortList(isSHortlIst, studentId, companyId, scheduleid);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+            
+        }
+            [HttpGet]
         [Route("api/schedule/get")]
         public HttpResponseMessage Get(string role, int userId)
         {
@@ -43,41 +60,48 @@ namespace Job_Fair_Sys_API.Controllers
                 var students = _scheduleRepository.DbContext.Students.ToList();
                 var companies = _scheduleRepository.DbContext.Companies.Where(c => c.Status == "Accept").ToList();
 
-                var models = new List<ScheduleViewModel>();
+                var models = new List<Models.ScheduleViewModel>();
 
                 foreach (var item in schedule)
                 {
-                    var student = students.FirstOrDefault(s => s.Id == item.StudentId);
                     var company = companies.FirstOrDefault(c => c.Id == item.CompanyId);
+                    var student = students.FirstOrDefault(s => s.Id == item.StudentId && s.StudentSelectedCompanies.Any(c => c.Company_Id == company.Id));
 
-                    var model = new ScheduleViewModel();
-
-                    model.id = item.Id;
-                    
-                    model.studentId = student.Id;   
-                    model.studentName = student.Name;
-                    model.aridNumber = student.AridNumber;
-                    model.companyId = company.Id;
-                    model.compnayName = company.Name;
-                    model.date = item.Date;
-                    model.startTime = item.StartTime;
-                    model.endTime = item.EndTime;
-                    model.interviewed = item.Interviewed;
-                    model.description = item.Description;
-                    model.allocatedRoom = item.AllocatedRoom;
-
-                    if (role == "Admin")
+                    if (company == null || student == null)
+                        continue;
+                    else
                     {
-                        model.createorId = item.AdminId ?? 0;
-                        model.creatorRole = "Admin";
-                    } 
-                    else if (role == "SocietyMember")
-                    {
-                        model.createorId = item.SocietyMemberId ?? 0;
-                        model.creatorRole = "SocietMember";
+                        var model = new Models.ScheduleViewModel
+                        {
+                            id = item.Id,
+
+                            studentId = student.Id,
+                            studentName = student.Name,
+                            aridNumber = student.AridNumber,
+                            companyId = company.Id,
+                            compnayName = company.Name,
+                            date = item.Date,
+                            startTime = item.StartTime,
+                            endTime = item.EndTime,
+                            interviewed = item.Interviewed,
+                            description = item.Description,
+                            allocatedRoom = item.AllocatedRoom,
+                            isShortListed = item.IsShortListed ?? false
+                        };
+
+                        if (role == "Admin")
+                        {
+                            model.createorId = item.AdminId ?? 0;
+                            model.creatorRole = "Admin";
+                        }
+                        else if (role == "SocietyMember")
+                        {
+                            model.createorId = item.SocietyMemberId ?? 0;
+                            model.creatorRole = "SocietMember";
+                        }
+
+                        models.Add(model);
                     }
-
-                    models.Add(model);
                 }
 
                 return Request.CreateResponse(HttpStatusCode.OK, models);
@@ -109,11 +133,11 @@ namespace Job_Fair_Sys_API.Controllers
 
                         if (startTime != null)
                         {
-                            List<InterviewSchedule> schedules = new List<InterviewSchedule>();
+                            List<Job_Fair_Sys_Data.InterviewSchedule> schedules = new List<Job_Fair_Sys_Data.InterviewSchedule>();
 
                             foreach (var std in students)
                             {
-                                var scd = new InterviewSchedule();
+                                var scd = new Job_Fair_Sys_Data.InterviewSchedule();
 
                                 var scheduleStartTime = new DateTime(startTime.Value.Year, startTime.Value.Month, startTime.Value.Day, startTime.Value.Hour, startTime.Value.Minute, startTime.Value.Second);
                                 var scheduleEndTime = new DateTime(startTime.Value.Year, startTime.Value.Month, startTime.Value.Day, startTime.Value.Hour, startTime.Value.Minute, startTime.Value.Second);
