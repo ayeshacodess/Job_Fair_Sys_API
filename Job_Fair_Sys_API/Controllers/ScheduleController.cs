@@ -25,16 +25,13 @@ namespace Job_Fair_Sys_API.Controllers
             _companyRespository = new CompanyRepository();
         }
 
-
-        
-
         [HttpGet]
         [Route("api/schedule/shortlist")]
-        public HttpResponseMessage GetShortList(bool isSHortlIst, int studentId, int companyId, int scheduleid)
+        public HttpResponseMessage ShortlistStudent(bool isShortList, int studentId, int companyId, int scheduleId)
         {
             try
             {
-                var scheduleRow = _scheduleRepository.GetRecordAndAddShortList(isSHortlIst, studentId, companyId, scheduleid);
+                _scheduleRepository.GetRecordAndAddShortList(isShortList, studentId, companyId, scheduleId);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
@@ -43,7 +40,8 @@ namespace Job_Fair_Sys_API.Controllers
             }
             
         }
-            [HttpGet]
+
+        [HttpGet]
         [Route("api/schedule/get")]
         public HttpResponseMessage Get(string role, int userId)
         {

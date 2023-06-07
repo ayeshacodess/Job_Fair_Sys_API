@@ -44,7 +44,8 @@ namespace Job_Fair_Sys_Data.Repositories
         public List<StudentSkill> GetStudentSkillsFromDb(string aridno)
         {
             var std = _dbContext.Students.FirstOrDefault(x => x.AridNumber == aridno);
-            return std.StudentSkills.ToList();
+            if (std != null) return std.StudentSkills.ToList();
+            else return new List<StudentSkill>();
         }
     }
 }
