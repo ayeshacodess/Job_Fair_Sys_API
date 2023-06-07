@@ -107,7 +107,15 @@ namespace Job_Fair_Sys_API.Controllers
             try
             {
                 var skills = _skillRepository.GetStudentSkillsFromDb(aridno);
-                return Request.CreateResponse(HttpStatusCode.OK, skills.ToList());
+
+                var response = new List<SkillViewModel>();
+
+                foreach (var item in skills)
+                {
+                    response.Add(SkillViewModel.ToViewModel(item.Skill));
+                }
+
+                return Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception ex)
             {
