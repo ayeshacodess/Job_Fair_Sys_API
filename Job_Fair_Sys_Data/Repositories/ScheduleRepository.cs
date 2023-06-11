@@ -10,6 +10,17 @@ namespace Job_Fair_Sys_Data.Repositories
         {
         }
 
+        public List<InterviewSchedule> GetAStudentSchedule(int id)
+        {
+            var studentSchedule = _dbContext.InterviewSchedules.Where(x => x.StudentId == id).ToList();
+            return studentSchedule;
+        }
+
+        public List<InterviewSchedule> GetACompanySchedule(int id)
+        {
+            var companySchedule = _dbContext.InterviewSchedules.Where(x => x.CompanyId == id).ToList();
+            return companySchedule;
+        }
         public List<InterviewSchedule> GetSchedules()
         {
             var scd = _dbContext.InterviewSchedules.ToList();
