@@ -166,8 +166,14 @@ namespace Job_Fair_Sys_API.Controllers
 
                         var newScheduleList = new List<InterviewSchedule>();
 
+                        var isCompanyBusyForWHoleTime = false;
+
                         foreach (var studentId in notScheduledStudentsIds)
                         {
+                            //If company is busy 
+                            if (isCompanyBusyForWHoleTime) 
+                                continue;
+
                             //getting current student schedule
                             var studentSchedule = notScheduledStudentsScheduleList.Where(x => x.StudentId == studentId);
 
@@ -223,7 +229,7 @@ namespace Job_Fair_Sys_API.Controllers
                                     else
                                     {
                                         //this case will be excecuted, when student is busy on givn company start time of the schedule
-                                        //TODO: We will do it later
+                                        
 
                                     } 
                                 } 
@@ -234,8 +240,19 @@ namespace Job_Fair_Sys_API.Controllers
                                     //start time change to next slot by adding 10 minutes in the start time
                                     companyStartTime = companyStartTime.Value.AddMinutes(10);
 
-                                    //do while loop will continue to find next avaialble start time
-                                    loopContinue = true;
+                                    //we have to check, is company end time is here or not.
+                                    var companyEndTime = GetCompanyEndTimeByTimeSlot(company.TimeSlot ?? 0);
+
+                                    if (companyStartTime.Value.TimeOfDay == companyEndTime.Value.TimeOfDay)
+                                    {
+                                        isCompanyBusyForWHoleTime = true;
+                                        loopContinue = false;
+                                    }
+                                    else
+                                    {
+                                        //do while loop will continue to find next avaialble start time
+                                        loopContinue = true;
+                                    }
                                 }
 
                             } while (loopContinue);
@@ -321,6 +338,27 @@ namespace Job_Fair_Sys_API.Controllers
 
                 default: return null;
                    
+            }
+        }
+
+        private DateTime? GetCompanyEndTimeByTimeSlot(int timeSlot)
+        {
+            var today = DateTime.Now;
+            var fivePm = new DateTime(today.Year, today.Month, today.Day, 17, 0, 0);
+            switch (timeSlot)
+            {
+                case 1:
+                    //9-12
+                    var twelvePm = new DateTime(today.Year, today.Month, today.Day, 12, 0, 0);
+                    return twelvePm;
+                case 2:
+                    //12-5
+                    return fivePm;
+                case 3:
+                    //9-5
+                    return fivePm;
+
+                default: return null;
             }
         }
     }
