@@ -85,10 +85,11 @@ namespace Job_Fair_Sys_API.Controllers
                         continue;
                     else
                     {
+
                         var model = new Models.ScheduleViewModel
                         {
                             id = item.Id,
-
+                            percentile = GetStudentPercentile(student.CGPA ?? 0),
                             studentId = student.Id,
                             studentName = student.Name,
                             aridNumber = student.AridNumber,
@@ -133,22 +134,24 @@ namespace Job_Fair_Sys_API.Controllers
            var httpRequest = HttpContext.Current.Request;
 
             using (var reader = new StreamReader(await Request.Content.ReadAsStreamAsync()))
-           {
+            {
                 try
                 {
                    string requestBody = reader.ReadToEnd();
                     var reqModel = JsonConvert.DeserializeObject<GenerateScheduleViewModel>(requestBody);
 
-                    //get the selected Company record to take 
+                    //get the selected Company record to take timeSlot
                     var company = _companyRespository.GetCompany(reqModel.selectedCompany);
                     if (company != null)
                     {
+                        //get the company schedule
                         var companySchedule = _scheduleRepository.GetACompanySchedule(reqModel.selectedCompany);
-                        var students = _scheduleRepository.GetStudents(company.Id);
-                        
-                        //companySchedule.
-                        var notScheduledStudentsIds = new List<int>();
 
+                        //get students id(s) who applied/selected the company
+                        var students = _scheduleRepository.GetStudents(company.Id);
+
+                        //get those students ids(and add in list) who selected the company but are not scheduled with the company
+                        var notScheduledStudentsIds = new List<int>();
                         foreach (var std in students)
                         {
                             var isScheduled = companySchedule.FirstOrDefault(x => x.StudentId == std.Student_Id);
@@ -158,14 +161,15 @@ namespace Job_Fair_Sys_API.Controllers
                             }
                         }
 
+                        //get the schedule of those students who are not scheduled with the company, to see their available time
                         var notScheduledStudentsScheduleList = _scheduleRepository
                             .DbContext.InterviewSchedules
                             .Where(x => notScheduledStudentsIds.Contains(x.StudentId)).ToList();
 
                         var companyStartTime = GetCompanyStartTimeByTimeSlot(company.TimeSlot ?? 0);
 
+                        var remainingStudentsIds = new List<int>();
                         var newScheduleList = new List<InterviewSchedule>();
-
                         var isCompanyBusyForWHoleTime = false;
 
                         foreach (var studentId in notScheduledStudentsIds)
@@ -177,11 +181,11 @@ namespace Job_Fair_Sys_API.Controllers
                             //getting current student schedule
                             var studentSchedule = notScheduledStudentsScheduleList.Where(x => x.StudentId == studentId);
 
-                            //flag to control the d while loop
+                            //flag to control the do while loop
                             var loopContinue = false;
                             do
                             {
-                                //checking is commpany busy on its start time or not
+                                //checking is commpany busy on its start time or not (on its strt time or in schedule time ??)
                                 var companyTempSchedule = companySchedule.FirstOrDefault(schedule => IsCompanyBusy(companyStartTime, schedule.StartTime));
                                 
                                 //if company is not buys then will go inside
@@ -225,18 +229,44 @@ namespace Job_Fair_Sys_API.Controllers
 
                                         //add schedule with in new list
                                         newScheduleList.Add(scd);
+
+                                        remainingStudentsIds.Remove(studentId);
                                     } 
                                     else
                                     {
                                         //this case will be excecuted, when student is busy on givn company start time of the schedule
-                                        
+                                        remainingStudentsIds.Add(studentId);
+                                        var tempList = remainingStudentsIds.Concat(notScheduledStudentsIds).Distinct().ToList();
+                                        notScheduledStudentsIds = tempList;
 
+                                        if (notScheduledStudentsIds.Count == 1)
+                                        {
+                                            //start time change to next slot by adding 10 minutes in the start time
+                                            companyStartTime = companyStartTime.Value.AddMinutes(10);
+
+                                            //we have to check, is company end time is here or not.
+                                            var companyEndTime = GetCompanyEndTimeByTimeSlot(company.TimeSlot ?? 0);
+
+                                            if (companyStartTime.Value.TimeOfDay == companyEndTime.Value.TimeOfDay)
+                                            {
+                                                isCompanyBusyForWHoleTime = true;
+                                                loopContinue = false;
+                                            }
+                                            else
+                                            {
+                                                //do while loop will continue to find next avaialble start time
+                                                loopContinue = true;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            loopContinue = false;
+                                        }
                                     } 
                                 } 
                                 else
                                 {
                                     //This case will be executed when the company is busy on start time
-
                                     //start time change to next slot by adding 10 minutes in the start time
                                     companyStartTime = companyStartTime.Value.AddMinutes(10);
 
@@ -257,40 +287,11 @@ namespace Job_Fair_Sys_API.Controllers
 
                             } while (loopContinue);
                         }
-                        //if (startTime != null)
-                        //{
-                        //    List<Job_Fair_Sys_Data.InterviewSchedule> schedules = new List<Job_Fair_Sys_Data.InterviewSchedule>();
 
-                        //    foreach (var std in students)
-                        //    {
-                        //        var scd = new Job_Fair_Sys_Data.InterviewSchedule();
-
-                        //        var scheduleStartTime = new DateTime(startTime.Value.Year, startTime.Value.Month, startTime.Value.Day, startTime.Value.Hour, startTime.Value.Minute, startTime.Value.Second);
-                        //        var scheduleEndTime = new DateTime(startTime.Value.Year, startTime.Value.Month, startTime.Value.Day, startTime.Value.Hour, startTime.Value.Minute, startTime.Value.Second);
-                        //        scheduleEndTime = scheduleEndTime.AddMinutes(reqModel.timeDuration);
-
-                        //        scd.StudentId = std.Student_Id;
-                        //        scd.CompanyId = company.Id;
-
-                        //        if (reqModel.role == "SocietyMember")
-                        //            scd.SocietyMemberId = reqModel.UserProfile;
-
-                        //        if (reqModel.role == "Admin")
-                        //            scd.AdminId = reqModel.UserProfile;
-
-                        //        scd.AllocatedRoom = reqModel.allocatedRoom;
-                        //        scd.StartTime = scheduleStartTime;
-                        //        scd.EndTime = scheduleEndTime;
-                        //        scd.Interviewed = false;
-                        //        scd.Date = DateTime.Now;
-                        //        scd.TimeDuration = reqModel.timeDuration;
-                        //        startTime = scheduleEndTime;
-
-                        //        schedules.Add(scd);
-                        //    }
-
-                        //    _scheduleRepository.AddSchedules(schedules);
-                        //}
+                        if (newScheduleList.Count > 0)
+                        {
+                            _scheduleRepository.AddSchedules(newScheduleList);
+                        }
 
                         return Request.CreateResponse(HttpStatusCode.OK, reqModel);
                     }
@@ -360,6 +361,27 @@ namespace Job_Fair_Sys_API.Controllers
 
                 default: return null;
             }
+        }
+
+        private string GetStudentPercentile(double cgpa) 
+        {
+            if (cgpa >= 3.5 && cgpa <= 4)
+            {
+                return "First Teer";
+            }
+            else if (cgpa >= 3 && cgpa <= 3.5)
+            {
+                return "Second Teer";
+            }
+            else if (cgpa < 3 )
+            {
+                return "Third Teer";
+            }
+            else
+            {
+               return "cgpa not found";
+            }
+
         }
     }
 }
