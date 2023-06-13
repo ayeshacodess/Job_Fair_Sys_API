@@ -180,6 +180,7 @@
     <Compile Include="Models\CompanyViewModel.cs" />
     <Compile Include="Models\EventFeedbackViewModel.cs" />
     <Compile Include="Models\GenerateScheduleViewModel.cs" />
+    <Compile Include="Models\InterviewedAndShortListedViewModel.cs" />
     <Compile Include="Models\MemberViewModel.cs" />
     <Compile Include="Models\ModelConvertor.cs" />
     <Compile Include="Models\ScheduleViewModel.cs" />

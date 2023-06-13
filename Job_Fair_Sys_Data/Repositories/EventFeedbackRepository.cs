@@ -28,7 +28,7 @@ namespace Job_Fair_Sys_Data.Repositories
 
         public EventFeedback GetCompanyFeedback(int id)
         {
-            var feedback = _dbContext.EventFeedbacks.Where(x => x.CompanyId == id).FirstOrDefault();
+            var feedback = _dbContext.EventFeedbacks.FirstOrDefault(x => x.CompanyId == id);
             return feedback;
         }
     }

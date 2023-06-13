@@ -97,7 +97,7 @@ namespace Job_Fair_Sys_API.Controllers
 
                     var reqData = JsonConvert.DeserializeObject<StudentViewModel>(requestBody);
                     Console.WriteLine(reqData);
-                     var dbStd = _studentRepository.GetStudentByAridNo(reqData.aridNumber);
+                    var dbStd = _studentRepository.DbContext.Students.FirstOrDefault(x => x.AridNumber == reqData.aridNumber);
                    
                     if (dbStd != null)
                     {
@@ -108,7 +108,7 @@ namespace Job_Fair_Sys_API.Controllers
                         dbStd.FypTitle = reqData.FypTitle;
                         dbStd.HasFYP = reqData.hasFYP;
                         dbStd.IsCVUploaded = true;
-                        dbStd.UserId = reqData.userId;
+                        
 
                         var removedSkills = dbStd.StudentSkills.ToList();
                         foreach (var s in removedSkills)
@@ -141,16 +141,10 @@ namespace Job_Fair_Sys_API.Controllers
                                 postedFile.SaveAs(filePath);
                                 docfiles.Add(filePath);
                             }
-                            result = Request.CreateResponse(HttpStatusCode.Created, docfiles);
-
-
                         }
-                        else
-                        {
-                            result = Request.CreateResponse(HttpStatusCode.BadRequest);
-                        }
+
                         _studentRepository.DbContext.Entry(dbStd).CurrentValues.SetValues(dbStd);
-                        _studentRepository.SaveChanges();
+                        _studentRepository.DbContext.SaveChanges();
 
                         return Request.CreateResponse(HttpStatusCode.OK, dbStd);
                     }

@@ -1,9 +1,12 @@
 ﻿using Job_Fair_Sys_API.Models;
 using Job_Fair_Sys_Data.Repositories;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Web;
 using System.Web.Http;
 
 namespace Job_Fair_Sys_API.Controllers 
@@ -39,49 +42,78 @@ namespace Job_Fair_Sys_API.Controllers
         }
 
         [HttpPost]
-        [Route("api/feedback/add")]
-        public HttpResponseMessage AddFeedback(EventFeedbackViewModel model)
+        [Route("api/eventFeedback/save")]
+        public async System.Threading.Tasks.Task<HttpResponseMessage> AddFeedback()
         {
-            try
-            {
-                if (model == null) return Request.CreateResponse(HttpStatusCode.NotAcceptable);
+            var httpRequest = HttpContext.Current.Request;
 
-                var entity = model.ToEntity();
-                _eventFeedbackRepository.Add(entity);
-
-                return Request.CreateResponse(HttpStatusCode.OK, model);
-            }
-            catch (Exception ex)
+            using (var reader = new StreamReader(await Request.Content.ReadAsStreamAsync()))
             {
-                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+                try
+                {
+                    string requestBody = reader.ReadToEnd();
+                    var feedback = JsonConvert.DeserializeObject<EventFeedbackViewModel>(requestBody);
+                    if (feedback == null) return Request.CreateResponse(HttpStatusCode.NotAcceptable);
+
+                    var entity = _eventFeedbackRepository.GetCompanyFeedback(feedback.companyId);
+
+                    if (entity == null)
+                    {
+                        var newEntity = feedback.ToEntity();
+                        _eventFeedbackRepository.Add(newEntity);
+                    }
+                    else
+                    {
+                        entity.CompanyId = feedback.companyId;
+                        entity.Feedback = feedback.feedbackContent;
+
+                        _eventFeedbackRepository.DbContext.Entry(entity).CurrentValues.SetValues(entity);
+                        _eventFeedbackRepository.SaveChanges();
+                    }
+
+                    return Request.CreateResponse(HttpStatusCode.OK);
+                }
+                catch (Exception ex)
+                {
+                    return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+                }
             }
         }
 
         [HttpPost]
         [Route("api/feedback/update")]
-        public HttpResponseMessage UpdateFeedback(EventFeedbackViewModel model)
-        {
-            try
+            public async System.Threading.Tasks.Task<HttpResponseMessage> UpdateFeedback()
+        
             {
-                if (model == null || model.id == 0)
-                    return Request.CreateResponse(HttpStatusCode.NotAcceptable);
+                var httpRequest = HttpContext.Current.Request;
 
-                var entity = _eventFeedbackRepository.GetCompanyFeedback(model.id);
+                using (var reader = new StreamReader(await Request.Content.ReadAsStreamAsync()))
+                {
+                    try
+                    {
+                            string requestBody = reader.ReadToEnd();
 
-                if (entity == null) return Request.CreateResponse(HttpStatusCode.NotFound);
+                            var feedback = JsonConvert.DeserializeObject<EventFeedbackViewModel>(requestBody);
+                             if (feedback == null || feedback.id == 0)
+                             return Request.CreateResponse(HttpStatusCode.NotAcceptable);
 
-                entity.CompanyId = model.companyId;
-                entity.Feedback = model.feedback;
+                             var entity = _eventFeedbackRepository.GetCompanyFeedback(feedback.id);
 
-                _eventFeedbackRepository.DbContext.Entry(entity).CurrentValues.SetValues(entity);
-                _eventFeedbackRepository.SaveChanges();
+                            if (entity == null) return Request.CreateResponse(HttpStatusCode.NotFound);
 
-                return Request.CreateResponse(HttpStatusCode.OK, model);
+                            entity.CompanyId = feedback.companyId;
+                         entity.Feedback = feedback.feedbackContent;
+
+                         _eventFeedbackRepository.DbContext.Entry(entity).CurrentValues.SetValues(entity);
+                         _eventFeedbackRepository.SaveChanges();
+
+                         return Request.CreateResponse(HttpStatusCode.OK, feedback);
+                    }
+                    catch (Exception ex)
+                    {
+                        return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+                    }
+                }
             }
-            catch (Exception ex)
-            {
-                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
-            }
-        }
     }
 }

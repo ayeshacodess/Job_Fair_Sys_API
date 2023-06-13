@@ -18,11 +18,12 @@ namespace Job_Fair_Sys_API.Controllers
     {
         private readonly ScheduleRepository _scheduleRepository;
         private readonly CompanyRepository _companyRespository;
-
+        private readonly StudentRepository _studentRepository;
         public ScheduleController()
         {
             _scheduleRepository = new ScheduleRepository();
             _companyRespository = new CompanyRepository();
+            _studentRepository = new StudentRepository();
         }
 
         [HttpGet]
@@ -49,6 +50,37 @@ namespace Job_Fair_Sys_API.Controllers
             {
                 _scheduleRepository.GetRecordAndAddInterviewed(isInterviewed, studentId, companyId, scheduleId);
                 return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+
+        }
+
+        [HttpGet]
+        [Route("api/schedule/interviewedAndShortListed")]
+        public HttpResponseMessage InterviewedAndShortListedStudents()
+        {
+            try
+            {
+                var schedule = _scheduleRepository.GetInterviewedAndShortListedStudents();
+                var model = new List<InterviewedAndShortListedViewModel>();
+                foreach (var item in schedule)
+                {
+                    var std = new InterviewedAndShortListedViewModel
+                    {
+                        companyName = item.Company.Name,
+                        studentName = item.Student.Name,
+                        aridNumber = item.Student.AridNumber,
+                        interviewed = isInterviewed(item.Interviewed),
+                        shortListed = isShortListed(item.IsShortListed ?? false),
+
+                    };
+                    model.Add(std);
+                }
+               
+                return Request.CreateResponse(HttpStatusCode.OK, model);
             }
             catch (Exception ex)
             {
@@ -382,6 +414,28 @@ namespace Job_Fair_Sys_API.Controllers
                return "cgpa not found";
             }
 
+        }
+        private string isInterviewed(Boolean interviewed)
+        {
+            if (interviewed)
+            {
+                return "Interviewed";
+            }
+            else
+            {
+                return "not interviewed";
+            }
+        }
+        private string isShortListed(Boolean shortListed)
+        {
+            if (shortListed)
+            {
+                return "ShortListed";
+            }
+            else
+            {
+                return "---";
+            }
         }
     }
 }

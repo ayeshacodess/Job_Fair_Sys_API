@@ -5,7 +5,7 @@ namespace Job_Fair_Sys_API.Models
     public class EventFeedbackViewModel
     {
         public int id { get; set; }
-        public string feedback { get; set; }
+        public string feedbackContent { get; set; }
         public int companyId { get; set; }
 
         public EventFeedback ToEntity()
@@ -13,7 +13,7 @@ namespace Job_Fair_Sys_API.Models
             var entity = new EventFeedback
             {
                 Id = this.id,
-                Feedback = this.feedback,
+                Feedback = this.feedbackContent,
                 CompanyId = this.companyId
             };
             return entity;
@@ -24,7 +24,7 @@ namespace Job_Fair_Sys_API.Models
             var model = new EventFeedbackViewModel
             {
                 id = entity.Id,
-                feedback = entity.Feedback,
+                feedbackContent = entity.Feedback,
                 companyId = entity.CompanyId
             };
 
