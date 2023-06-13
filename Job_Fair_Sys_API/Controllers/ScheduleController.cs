@@ -183,35 +183,37 @@ namespace Job_Fair_Sys_API.Controllers
                         var students = _scheduleRepository.GetStudents(company.Id);
 
                         //get those students ids(and add in list) who selected the company but are not scheduled with the company
-                        var notScheduledStudentsIds = new List<int>();
+                        var notScheduledStudentsIds = new List<StudentsCGPAModel>();
                         foreach (var std in students)
                         {
                             var isScheduled = companySchedule.FirstOrDefault(x => x.StudentId == std.Student_Id);
                             if(isScheduled == null)
                             {
-                                notScheduledStudentsIds.Add(std.Student_Id);
+                                notScheduledStudentsIds.Add(new StudentsCGPAModel { studentId= std.Student_Id , CGPA = std.Student.CGPA ?? 0.00});
                             }
                         }
 
                         //get the schedule of those students who are not scheduled with the company, to see their available time
                         var notScheduledStudentsScheduleList = _scheduleRepository
                             .DbContext.InterviewSchedules
-                            .Where(x => notScheduledStudentsIds.Contains(x.StudentId)).ToList();
+                            .Where(x => notScheduledStudentsIds.Any(i => i.studentId == x.StudentId)).ToList();
 
                         var companyStartTime = GetCompanyStartTimeByTimeSlot(company.TimeSlot ?? 0);
 
-                        var remainingStudentsIds = new List<int>();
+                        var remainingStudentsIds = new List<StudentsCGPAModel>();
                         var newScheduleList = new List<InterviewSchedule>();
                         var isCompanyBusyForWHoleTime = false;
 
-                        foreach (var studentId in notScheduledStudentsIds)
+                        notScheduledStudentsIds = notScheduledStudentsIds.OrderBy(x => x.CGPA).ToList();
+
+                        foreach (var studentItem in notScheduledStudentsIds)
                         {
                             //If company is busy 
                             if (isCompanyBusyForWHoleTime) 
                                 continue;
 
                             //getting current student schedule
-                            var studentSchedule = notScheduledStudentsScheduleList.Where(x => x.StudentId == studentId);
+                            var studentSchedule = notScheduledStudentsScheduleList.Where(x => x.StudentId == studentItem.studentId);
 
                             //flag to control the do while loop
                             var loopContinue = false;
@@ -237,7 +239,7 @@ namespace Job_Fair_Sys_API.Controllers
                                         //create a schedule object, as both parties are not busy
                                         var scd = new InterviewSchedule
                                         {
-                                            StudentId = studentId,
+                                            StudentId = studentItem.studentId,
                                             CompanyId = company.Id,
                                             AllocatedRoom = reqModel.allocatedRoom,
                                             StartTime = scheduleStartTime,
@@ -262,13 +264,13 @@ namespace Job_Fair_Sys_API.Controllers
                                         //add schedule with in new list
                                         newScheduleList.Add(scd);
 
-                                        remainingStudentsIds.Remove(studentId);
+                                        remainingStudentsIds.Remove(studentItem);
                                     } 
                                     else
                                     {
                                         //this case will be excecuted, when student is busy on givn company start time of the schedule
-                                        remainingStudentsIds.Add(studentId);
-                                        var tempList = remainingStudentsIds.Concat(notScheduledStudentsIds).Distinct().ToList();
+                                        remainingStudentsIds.Add(studentItem);
+                                        var tempList = remainingStudentsIds.Concat(notScheduledStudentsIds).Distinct().OrderBy(x => x.CGPA).ToList();
                                         notScheduledStudentsIds = tempList;
 
                                         if (notScheduledStudentsIds.Count == 1)
