@@ -108,12 +108,14 @@ namespace Job_Fair_Sys_API.Controllers
                         dbStd.FypTitle = reqData.FypTitle;
                         dbStd.HasFYP = reqData.hasFYP;
                         dbStd.IsCVUploaded = true;
-                        
 
-                        var removedSkills = dbStd.StudentSkills.ToList();
-                        foreach (var s in removedSkills)
+                        _studentRepository.DbContext.Entry(dbStd).CurrentValues.SetValues(dbStd);
+                        _studentRepository.DbContext.SaveChanges();
+
+                        var studentSkills = _studentRepository.DbContext.StudentSkills.Where(x => x.StudentId == dbStd.Id);
+                        foreach (var item in studentSkills)
                         {
-                            dbStd.StudentSkills.Remove(s);
+                            _studentRepository.DbContext.StudentSkills.Remove(item);
                         }
 
                         var skills = _studentRepository.DbContext.Skills.ToList();
@@ -122,15 +124,20 @@ namespace Job_Fair_Sys_API.Controllers
                         {
                             var skl = skills.FirstOrDefault(x => x.Id == skill.skill_Id);
 
-                            var newRequiredSkill = new StudentSkill
-                            {
-                                Level_Id = skill.level_Id,
-                                Skill = skl 
-                            };
+                            if (skl != null) {
+                                var newRequiredSkill = new StudentSkill
+                                {
+                                    Level_Id = skill.level_Id,
+                                    Skill_Id = skl.Id,
+                                    StudentId = dbStd.Id
+                                };
 
-                            dbStd.StudentSkills.Add(newRequiredSkill);
+                                _studentRepository.DbContext.StudentSkills.Add(newRequiredSkill);
+                            }
                         }
-                        HttpResponseMessage result = null;
+
+                        _studentRepository.DbContext.SaveChanges();
+
                         if (HttpContext.Current.Request.Files.Count > 0)
                         {
                             var docfiles = new List<string>();
@@ -142,9 +149,6 @@ namespace Job_Fair_Sys_API.Controllers
                                 docfiles.Add(filePath);
                             }
                         }
-
-                        _studentRepository.DbContext.Entry(dbStd).CurrentValues.SetValues(dbStd);
-                        _studentRepository.DbContext.SaveChanges();
 
                         return Request.CreateResponse(HttpStatusCode.OK, dbStd);
                     }
