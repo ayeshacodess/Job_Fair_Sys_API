@@ -174,11 +174,14 @@
     <Compile Include="Controllers\SocietyMemberController.cs" />
     <Compile Include="Controllers\StudentController.cs" />
     <Compile Include="Controllers\StudentFeedbackController.cs" />
+    <Compile Include="Controllers\SummaryController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="SharedHelper\Utility.cs" />
     <Compile Include="Models\CompanyViewModel.cs" />
     <Compile Include="Models\EventFeedbackViewModel.cs" />
+    <Compile Include="Models\ExectiveSummaryViewModel.cs" />
     <Compile Include="Models\GenerateScheduleViewModel.cs" />
     <Compile Include="Models\InterviewedAndShortListedViewModel.cs" />
     <Compile Include="Models\MemberViewModel.cs" />

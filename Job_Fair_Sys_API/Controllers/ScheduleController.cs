@@ -121,7 +121,7 @@ namespace Job_Fair_Sys_API.Controllers
                         var model = new Models.ScheduleViewModel
                         {
                             id = item.Id,
-                            percentile = GetStudentPercentile(student.CGPA ?? 0),
+                            percentile = SharedHelper.Utility.GetStudentPercentile(student.CGPA ?? 0),
                             studentId = student.Id,
                             studentName = student.Name,
                             aridNumber = student.AridNumber,
@@ -395,27 +395,6 @@ namespace Job_Fair_Sys_API.Controllers
 
                 default: return null;
             }
-        }
-
-        private string GetStudentPercentile(double cgpa) 
-        {
-            if (cgpa >= 3.5 && cgpa <= 4)
-            {
-                return "First Teer";
-            }
-            else if (cgpa >= 3 && cgpa <= 3.5)
-            {
-                return "Second Teer";
-            }
-            else if (cgpa < 3 )
-            {
-                return "Third Teer";
-            }
-            else
-            {
-               return "cgpa not found";
-            }
-
         }
         private string isInterviewed(Boolean interviewed)
         {
