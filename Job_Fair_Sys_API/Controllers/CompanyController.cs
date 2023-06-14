@@ -258,7 +258,7 @@ namespace Job_Fair_Sys_API.Controllers
         public HttpResponseMessage CompanyRating(int companyId, int rating)
         {
             var company = _companyRespository.DbContext.Companies.FirstOrDefault(x => x.Id == companyId);
-
+            
             if (company != null)
             {
                 company.rate = rating;

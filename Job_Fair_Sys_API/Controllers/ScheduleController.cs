@@ -158,7 +158,189 @@ namespace Job_Fair_Sys_API.Controllers
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
-           
+
+        [HttpGet]
+        [Route("api/schedule/jumpTheQueue")]
+        public HttpResponseMessage Jump(int companyId, int studentId)
+        {
+            try
+            {
+                var company = _companyRespository.GetCompany(companyId);
+                if(company != null)
+                {
+                    _scheduleRepository.DeleteCompanySchedule(companyId);
+
+                    //get company schedule
+                    var companySchedule = _scheduleRepository.GetACompanySchedule(companyId);
+
+                    var allocatedroom = companySchedule.FirstOrDefault()?.AllocatedRoom ?? "lab 10";
+
+                    //get students id(s) who applied/selected the company
+                    var students = _scheduleRepository.GetStudents(company.Id);
+
+                    //get those students ids(and add in list) who selected the company but are not scheduled with the company
+                    var notScheduledStudentsIds = new List<StudentsCGPAModel>();
+                    
+                    StudentsCGPAModel firstStudent = new StudentsCGPAModel();
+
+                    foreach (var std in students)
+                    {
+                        if (std.Student_Id == studentId)
+                        {
+                            firstStudent.studentId = studentId;
+                            firstStudent.CGPA = std.Student.CGPA ?? 0.00;
+                        }
+                        else 
+                        {
+                            notScheduledStudentsIds.Add(new StudentsCGPAModel { studentId = std.Student_Id, CGPA = std.Student.CGPA ?? 0.00 });
+                        } 
+                    }
+
+                    notScheduledStudentsIds = notScheduledStudentsIds.OrderBy(x => x.CGPA).ToList();
+                    notScheduledStudentsIds.Insert(0, firstStudent);
+
+                    //get the schedule of those students who are not scheduled with the company, to see their available time
+                    var notScheduledStudentsScheduleList = _scheduleRepository.DbContext.InterviewSchedules.ToList();
+                    notScheduledStudentsScheduleList = notScheduledStudentsScheduleList.Where(x => notScheduledStudentsIds.Any(i => i.studentId == x.StudentId)).ToList();
+
+                    var companyStartTime = GetCompanyStartTimeByTimeSlot(company.TimeSlot ?? 0);
+
+                    var remainingStudentsIds = new List<StudentsCGPAModel>();
+                    var newScheduleList = new List<InterviewSchedule>();
+                    var isCompanyBusyForWHoleTime = false;
+
+                    foreach (var studentItem in notScheduledStudentsIds)
+                    {
+                        //If company is busy 
+                        if (isCompanyBusyForWHoleTime)
+                            continue;
+
+                        //getting current student schedule
+                        var studentSchedule = notScheduledStudentsScheduleList.Where(x => x.StudentId == studentItem.studentId);
+
+                        //flag to control the do while loop
+                        var loopContinue = false;
+                        do
+                        {
+                            //checking is commpany busy on its start time or not (on its strt time or in schedule time ??)
+                            var companyTempSchedule = companySchedule.FirstOrDefault(schedule => IsCompanyBusy(companyStartTime, schedule.StartTime));
+
+                            //if company is not buys then will go inside
+                            if (companyTempSchedule == null)
+                            {
+                                //need to verify the availablity of student, is he available or not
+                                var studentTempSchedule = studentSchedule.FirstOrDefault(schedule => IsCompanyBusy(companyStartTime, schedule.StartTime));
+
+                                if (studentItem.studentId == studentId)
+                                {
+                                    //no need to check availablity 
+                                    studentTempSchedule = null;
+                                }
+
+                                //is student is not available, then go inside
+                                if (studentTempSchedule == null)
+                                {
+                                    //create schedule start and end time, based on company and student available start and end time
+                                    var scheduleStartTime = new DateTime(companyStartTime.Value.Year, companyStartTime.Value.Month, companyStartTime.Value.Day, companyStartTime.Value.Hour, companyStartTime.Value.Minute, companyStartTime.Value.Second);
+                                    var scheduleEndTime = new DateTime(companyStartTime.Value.Year, companyStartTime.Value.Month, companyStartTime.Value.Day, companyStartTime.Value.Hour, companyStartTime.Value.Minute, companyStartTime.Value.Second);
+                                    scheduleEndTime = scheduleEndTime.AddMinutes(10);
+
+                                    //create a schedule object, as both parties are not busy
+                                    var scd = new InterviewSchedule
+                                    {
+                                        StudentId = studentItem.studentId,
+                                        CompanyId = company.Id,
+                                        AllocatedRoom = allocatedroom,
+                                        StartTime = scheduleStartTime,
+                                        EndTime = scheduleEndTime,
+                                        Interviewed = false,
+                                        Date = DateTime.Now,
+                                        TimeDuration = 10
+                                    };
+
+
+                                    //assign the company time with the current new schedule end time
+                                    companyStartTime = scheduleEndTime;
+
+                                    //discontinue the do while loop
+                                    loopContinue = false;
+
+                                    //add schedule with in new list
+                                    newScheduleList.Add(scd);
+
+                                    remainingStudentsIds.Remove(studentItem);
+                                }
+                                else
+                                {
+                                    //this case will be excecuted, when student is busy on givn company start time of the schedule
+                                    remainingStudentsIds.Add(studentItem);
+                                    var tempList = remainingStudentsIds.Concat(notScheduledStudentsIds).Distinct().OrderBy(x => x.CGPA).ToList();
+                                    notScheduledStudentsIds = tempList;
+
+                                    if (notScheduledStudentsIds.Count == 1)
+                                    {
+                                        //start time change to next slot by adding 10 minutes in the start time
+                                        companyStartTime = companyStartTime.Value.AddMinutes(10);
+
+                                        //we have to check, is company end time is here or not.
+                                        var companyEndTime = GetCompanyEndTimeByTimeSlot(company.TimeSlot ?? 0);
+
+                                        if (companyStartTime.Value.TimeOfDay == companyEndTime.Value.TimeOfDay)
+                                        {
+                                            isCompanyBusyForWHoleTime = true;
+                                            loopContinue = false;
+                                        }
+                                        else
+                                        {
+                                            //do while loop will continue to find next avaialble start time
+                                            loopContinue = true;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        loopContinue = false;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                //This case will be executed when the company is busy on start time
+                                //start time change to next slot by adding 10 minutes in the start time
+                                companyStartTime = companyStartTime.Value.AddMinutes(10);
+
+                                //we have to check, is company end time is here or not.
+                                var companyEndTime = GetCompanyEndTimeByTimeSlot(company.TimeSlot ?? 0);
+
+                                if (companyStartTime.Value.TimeOfDay == companyEndTime.Value.TimeOfDay)
+                                {
+                                    isCompanyBusyForWHoleTime = true;
+                                    loopContinue = false;
+                                }
+                                else
+                                {
+                                    //do while loop will continue to find next avaialble start time
+                                    loopContinue = true;
+                                }
+                            }
+
+                        } while (loopContinue);
+                    }
+
+                    if (newScheduleList.Count > 0)
+                    {
+                        _scheduleRepository.AddSchedules(newScheduleList);
+                    }
+
+                }
+
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
         [HttpPost]
         [Route("api/schedule/generate")]
         public async System.Threading.Tasks.Task<HttpResponseMessage> scheduleAsync()
@@ -234,7 +416,7 @@ namespace Job_Fair_Sys_API.Controllers
                                         //create schedule start and end time, based on company and student available start and end time
                                         var scheduleStartTime = new DateTime(companyStartTime.Value.Year, companyStartTime.Value.Month, companyStartTime.Value.Day, companyStartTime.Value.Hour, companyStartTime.Value.Minute, companyStartTime.Value.Second);
                                         var scheduleEndTime = new DateTime(companyStartTime.Value.Year, companyStartTime.Value.Month, companyStartTime.Value.Day, companyStartTime.Value.Hour, companyStartTime.Value.Minute, companyStartTime.Value.Second);
-                                        scheduleEndTime = scheduleEndTime.AddMinutes(reqModel.timeDuration);
+                                        scheduleEndTime = scheduleEndTime.AddMinutes(10);
 
                                         //create a schedule object, as both parties are not busy
                                         var scd = new InterviewSchedule

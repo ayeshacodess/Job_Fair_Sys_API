@@ -26,6 +26,19 @@ namespace Job_Fair_Sys_Data.Repositories
             var companySchedule = _dbContext.InterviewSchedules.Where(x => x.CompanyId == id).ToList();
             return companySchedule;
         }
+
+        public bool DeleteCompanySchedule(int id)
+        {
+            var companySchedule = _dbContext.InterviewSchedules.Where(x => x.CompanyId == id);
+            
+            foreach (var item in companySchedule)
+            {
+                _dbContext.InterviewSchedules.Remove(item);
+            }
+
+            return _dbContext.SaveChanges() > 0;
+        }
+
         public List<InterviewSchedule> GetSchedules()
         {
             var scd = _dbContext.InterviewSchedules.ToList();
