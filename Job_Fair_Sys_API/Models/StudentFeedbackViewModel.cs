@@ -11,7 +11,13 @@ namespace Job_Fair_Sys_API.Models
         
         public Nullable<int> studentId { get; set; }
         public Nullable<int> companyId { get; set; }
+        public string companyName { get; set; }
         public List<FeedbackViewMOdel> stdFeedback { get; set; }
+
+        public StudentFeedbackViewModel()
+        {
+            stdFeedback = new List<FeedbackViewMOdel>();
+        }
 
     }
 
@@ -19,5 +25,6 @@ namespace Job_Fair_Sys_API.Models
     {
         public int rate { get; set; }
         public int skill_ld { get; set; }
+        public string skillName { get; set; }
     }
 }

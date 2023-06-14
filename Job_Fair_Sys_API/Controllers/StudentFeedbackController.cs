@@ -21,7 +21,7 @@ namespace Job_Fair_Sys_API.Controllers
             _studentFeedbackRespository = new StudentFeedbackRepository();
         }
 
-            [Route("api/student/studentFeedback")]
+        [Route("api/student/studentFeedback")]
         [HttpPost]
         public async Task<HttpResponseMessage> StudentFeedback()
         {
@@ -54,6 +54,49 @@ namespace Job_Fair_Sys_API.Controllers
 
             }
         }
-            
+
+        [Route("api/student/getStudentFeedback")]
+        [HttpGet]
+        public HttpResponseMessage getStudentFeedback(int id)
+        {
+            try
+            {
+                var studentFeedbacks = _studentFeedbackRespository.DbContext.StudentsFeedbacks.Where(x => x.StudentId == id).ToList();
+
+                var groupedData = studentFeedbacks.GroupBy(x => x.CompanyId).ToList();
+
+                var models = new List<StudentFeedbackViewModel>();
+                foreach (var item in groupedData)
+                {
+                    var feedbacks = item.ToList();
+
+                    var model = new StudentFeedbackViewModel();
+
+                    foreach (var fb in feedbacks)
+                    {
+                        model.studentId = fb.StudentId;
+                        model.companyId = fb.Company.Id;
+                        model.companyName = fb.Company.Name;
+
+                        var data = new FeedbackViewMOdel
+                        {
+                            rate = fb.rate ?? 0,
+                            skillName = fb.Skill.Technology,
+                            skill_ld = fb.Skill.Id
+                        };
+
+                        model.stdFeedback.Add(data);
+                    }
+
+                    models.Add(model);
+                }
+                
+                return Request.CreateResponse(HttpStatusCode.OK, models);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
     }
 }
