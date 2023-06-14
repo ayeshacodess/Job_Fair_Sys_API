@@ -28,9 +28,9 @@ namespace Job_Fair_Sys_Data
         public string AllocatedRoom { get; set; }
         public Nullable<bool> IsShortListed { get; set; }
     
-        public virtual Company Company { get; set; }
         public virtual SocietyMember SocietyMember { get; set; }
         public virtual Student Student { get; set; }
         public virtual User User { get; set; }
+        public virtual Company Company { get; set; }
     }
 }

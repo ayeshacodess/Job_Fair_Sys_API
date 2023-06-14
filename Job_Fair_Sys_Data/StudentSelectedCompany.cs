@@ -19,7 +19,7 @@ namespace Job_Fair_Sys_Data
         public int Student_Id { get; set; }
         public Nullable<bool> DummyColumn { get; set; }
     
-        public virtual Company Company { get; set; }
         public virtual Student Student { get; set; }
+        public virtual Company Company { get; set; }
     }
 }

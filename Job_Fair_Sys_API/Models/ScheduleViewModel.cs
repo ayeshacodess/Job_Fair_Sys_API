@@ -10,8 +10,9 @@ namespace Job_Fair_Sys_API.Models
         public string aridNumber { get; set; }
         public int companyId { get; set; }
         public string compnayName { get; set; }
+        public int companyRate { get; set; }
         public int createorId { get; set; }
-        public string  creatorRole { get; set; }
+        public string creatorRole { get; set; }
         public System.DateTime date { get; set; }
         public Nullable<System.DateTime> startTime { get; set; }
         public Nullable<System.DateTime> endTime { get; set; }
@@ -20,6 +21,6 @@ namespace Job_Fair_Sys_API.Models
         public string allocatedRoom { get; set; }
         public bool isShortListed { get; set; } = false;
         public string percentile { get; set; }
-
+        public double cgpa { get; set; } = 0.0;
     }
 }

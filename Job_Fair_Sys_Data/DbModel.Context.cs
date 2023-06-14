@@ -25,7 +25,6 @@ namespace Job_Fair_Sys_Data
             throw new UnintentionalCodeFirstException();
         }
     
-        public DbSet<Company> Companies { get; set; }
         public DbSet<CompanyRequiredSkill> CompanyRequiredSkills { get; set; }
         public DbSet<EventFeedback> EventFeedbacks { get; set; }
         public DbSet<InterviewSchedule> InterviewSchedules { get; set; }
@@ -37,5 +36,6 @@ namespace Job_Fair_Sys_Data
         public DbSet<sysdiagram> sysdiagrams { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<StudentsFeedback> StudentsFeedbacks { get; set; }
+        public DbSet<Company> Companies { get; set; }
     }
 }

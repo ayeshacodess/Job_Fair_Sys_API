@@ -5,7 +5,6 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="aa0f92aa7f234bd386e1677bd8fbdaac" Name="Diagram1">
-        <EntityTypeShape EntityType="DbModel.Company" Width="1.5" PointX="3" PointY="7.875" />
         <EntityTypeShape EntityType="DbModel.CompanyRequiredSkill" Width="1.5" PointX="5.25" PointY="9" />
         <EntityTypeShape EntityType="DbModel.EventFeedback" Width="1.5" PointX="5.25" PointY="18.375" />
         <EntityTypeShape EntityType="DbModel.InterviewSchedule" Width="1.5" PointX="8.25" PointY="8.375" />
@@ -16,12 +15,6 @@
         <EntityTypeShape EntityType="DbModel.StudentSkill" Width="1.5" PointX="8.25" PointY="17.75" />
         <EntityTypeShape EntityType="DbModel.sysdiagram" Width="1.5" PointX="0.75" PointY="0.75" />
         <EntityTypeShape EntityType="DbModel.User" Width="1.5" PointX="0.75" PointY="13.25" />
-        <AssociationConnector Association="DbModel.FK_Company_Company" />
-        <AssociationConnector Association="DbModel.FK_Company_User" />
-        <AssociationConnector Association="DbModel.FK_CompanyRequiredSkill_Company" />
-        <AssociationConnector Association="DbModel.FK_EventFeedback_Company" />
-        <AssociationConnector Association="DbModel.FK_InterviewSchedule_Company" />
-        <AssociationConnector Association="DbModel.FK_StudentSelectedCompanies_Company1" />
         <AssociationConnector Association="DbModel.FK_CompanyRequiredSkill_Skill" />
         <AssociationConnector Association="DbModel.FK_InterviewSchedule_SocietyMember" />
         <AssociationConnector Association="DbModel.FK_InterviewSchedule_Student" />
@@ -32,9 +25,16 @@
         <AssociationConnector Association="DbModel.FK_Student_User" />
         <AssociationConnector Association="DbModel.FK_StudentSelectedCompanies_Student" />
         <EntityTypeShape EntityType="DbModel.StudentsFeedback" Width="1.5" PointX="5.25" PointY="11.875" />
-        <AssociationConnector Association="DbModel.FK_StudentsFeedback_Company" />
         <AssociationConnector Association="DbModel.FK_StudentsFeedback_Skill" />
         <AssociationConnector Association="DbModel.FK_StudentsFeedback_Student" />
+        <EntityTypeShape EntityType="DbModel.Company" Width="1.5" PointX="3" PointY="22.25" />
+        <AssociationConnector Association="DbModel.FK_Company_Company" />
+        <AssociationConnector Association="DbModel.FK_Company_User" />
+        <AssociationConnector Association="DbModel.FK_CompanyRequiredSkill_Company" />
+        <AssociationConnector Association="DbModel.FK_EventFeedback_Company" />
+        <AssociationConnector Association="DbModel.FK_InterviewSchedule_Company" />
+        <AssociationConnector Association="DbModel.FK_StudentSelectedCompanies_Company1" />
+        <AssociationConnector Association="DbModel.FK_StudentsFeedback_Company" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

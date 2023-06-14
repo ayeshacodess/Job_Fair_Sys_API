@@ -253,6 +253,24 @@ namespace Job_Fair_Sys_API.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, acceptedCompanies);
         }
 
+        [HttpGet]
+        [Route("api/company/rating")]
+        public HttpResponseMessage CompanyRating(int companyId, int rating)
+        {
+            var company = _companyRespository.DbContext.Companies.FirstOrDefault(x => x.Id == companyId);
+
+            if (company != null)
+            {
+                company.rate = rating;
+
+                _companyRespository.DbContext.Entry(company).CurrentValues.SetValues(company);
+                _companyRespository.SaveChanges();
+
+            }
+
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
         private List<CompanyViewModel> GetCompaniesDataByRole(string role, int id)
         {
             //related companiries..
