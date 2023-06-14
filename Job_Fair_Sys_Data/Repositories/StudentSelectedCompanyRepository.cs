@@ -27,8 +27,14 @@ namespace Job_Fair_Sys_Data.Repositories
 
         public StudentSelectedCompany GetStudentSelectedCompany(int studentId, int companyId)
         {
-            var company = _dbContext.StudentSelectedCompanies.FirstOrDefault(x => x.Company_Id == companyId && x.Student_Id == studentId);
-            return company ;
+            //Both method can be used
+            //var query = $"SELECT * FROM StudentSelectedCompanies WHERE Student_Id = {studentId} AND Company_Id = {companyId}";
+            //var company = _dbContext.StudentSelectedCompanies.SqlQuery(query).FirstOrDefault();
+
+            //As no tracking does not allow DB Context to cache data, it will get data directly from DB and return it.
+            var company = _dbContext.StudentSelectedCompanies.AsNoTracking().FirstOrDefault(x => x.Company_Id == companyId && x.Student_Id == studentId);
+
+            return company;
         }
 
         public void Add(StudentSelectedCompany company)
