@@ -27,10 +27,10 @@ namespace Job_Fair_Sys_API.Controllers
             {
                 var feedbacks = _eventFeedbackRepository.GetEventFeedbacks();
 
-                var models = new List<EventFeedbackViewModel>();
+                var models = new List<DisplayEventFeedbackViewModel>();
                 foreach (var item in feedbacks)
                 {
-                    models.Add(EventFeedbackViewModel.ToViewModel(item));
+                    models.Add(DisplayEventFeedbackViewModel.ToViewModel(item));
                 }
 
                 return Request.CreateResponse(HttpStatusCode.OK, models);
