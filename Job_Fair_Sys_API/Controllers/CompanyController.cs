@@ -8,7 +8,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 
@@ -28,6 +27,7 @@ namespace Job_Fair_Sys_API.Controllers
             _accountRepository = new AccountRepository();
             _studentRepository = new StudentRepository();
         }
+
 
         [HttpGet]
         [Route("api/companies")]
@@ -231,7 +231,7 @@ namespace Job_Fair_Sys_API.Controllers
         public HttpResponseMessage StudentSelectUnselectCompany(int companyId,  int studentId)
         {
            
-            var company = _studentSelectedCompanyRepository.GetStudentSelectedCompany(studentId, companyId);
+            var company = _studentSelectedCompanyRepository.DbContext.StudentSelectedCompanies.FirstOrDefault(x => x.Student_Id == studentId && x.Company_Id == companyId);
 
             if (company == null)
             {
@@ -245,7 +245,8 @@ namespace Job_Fair_Sys_API.Controllers
             }
             else 
             {
-                _studentSelectedCompanyRepository.Remove(company);
+                _studentSelectedCompanyRepository.DbContext.StudentSelectedCompanies.Remove(company);
+                _studentSelectedCompanyRepository.SaveChanges();
             }
 
             var acceptedCompanies = GetCompaniesForStudent(studentId);

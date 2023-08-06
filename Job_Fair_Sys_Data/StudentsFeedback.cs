@@ -20,8 +20,8 @@ namespace Job_Fair_Sys_Data
         public Nullable<int> rate { get; set; }
         public Nullable<int> Skill_ld { get; set; }
     
+        public virtual Company Company { get; set; }
         public virtual Skill Skill { get; set; }
         public virtual Student Student { get; set; }
-        public virtual Company Company { get; set; }
     }
 }

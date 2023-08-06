@@ -11,7 +11,15 @@ namespace Job_Fair_Sys_Data.Repositories
         public StudentRepository() : base()
         {
         }
-
+        public void AddTeerPasses(List<Student> students)
+        {
+            foreach (var std in students)
+            {
+                _dbContext.Entry(std).CurrentValues.SetValues(std);
+                _dbContext.Students.Add(std);
+            }
+            _dbContext.SaveChanges();
+        }
         public List<Student> GetStudents()
         {
             var students = _dbContext.Students.Where(x => x.IsCVUploaded == true).ToList();

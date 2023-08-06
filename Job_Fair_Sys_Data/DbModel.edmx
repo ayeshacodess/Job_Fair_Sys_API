@@ -56,6 +56,14 @@
           <Property Name="AllocatedRoom" Type="nvarchar" MaxLength="30" />
           <Property Name="IsShortListed" Type="bit" />
         </EntityType>
+        <EntityType Name="Pass">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="level2" Type="int" />
+          <Property Name="level1" Type="int" />
+        </EntityType>
         <EntityType Name="Skill">
           <Key>
             <PropertyRef Name="Id" />
@@ -93,6 +101,9 @@
           <Property Name="FypTech" Type="nvarchar" MaxLength="500" />
           <Property Name="FypGrad" Type="nvarchar" MaxLength="500" />
           <Property Name="IsCVUploaded" Type="bit" />
+          <Property Name="noOfJumps" Type="int" />
+          <Property Name="isAllowedJumps" Type="bit" />
+          <Property Name="noOfJumpsTaken" Type="int" />
         </EntityType>
         <EntityType Name="StudentSelectedCompanies">
           <Key>
@@ -101,7 +112,7 @@
           <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="Company_Id" Type="int" Nullable="false" />
           <Property Name="Student_Id" Type="int" Nullable="false" />
-          <Property Name="DummyColumn" Type="bit" />
+          <Property Name="IsJumped" Type="bit" />
         </EntityType>
         <EntityType Name="StudentsFeedback">
           <Key>
@@ -362,6 +373,7 @@
           <EntitySet Name="CompanyRequiredSkill" EntityType="Self.CompanyRequiredSkill" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="EventFeedback" EntityType="Self.EventFeedback" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="InterviewSchedule" EntityType="Self.InterviewSchedule" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Pass" EntityType="Self.Pass" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Skill" EntityType="Self.Skill" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SocietyMember" EntityType="Self.SocietyMember" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Student" EntityType="Self.Student" Schema="dbo" store:Type="Tables" />
@@ -448,62 +460,19 @@
     <edmx:ConceptualModels>
       <Schema Namespace="DbModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
         <EntityContainer Name="JobFairMgtEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Companies" EntityType="DbModel.Company" />
           <EntitySet Name="CompanyRequiredSkills" EntityType="DbModel.CompanyRequiredSkill" />
           <EntitySet Name="EventFeedbacks" EntityType="DbModel.EventFeedback" />
           <EntitySet Name="InterviewSchedules" EntityType="DbModel.InterviewSchedule" />
+          <EntitySet Name="Passes" EntityType="DbModel.Pass" />
           <EntitySet Name="Skills" EntityType="DbModel.Skill" />
           <EntitySet Name="SocietyMembers" EntityType="DbModel.SocietyMember" />
           <EntitySet Name="Students" EntityType="DbModel.Student" />
           <EntitySet Name="StudentSelectedCompanies" EntityType="DbModel.StudentSelectedCompany" />
+          <EntitySet Name="StudentsFeedbacks" EntityType="DbModel.StudentsFeedback" />
           <EntitySet Name="StudentSkills" EntityType="DbModel.StudentSkill" />
           <EntitySet Name="sysdiagrams" EntityType="DbModel.sysdiagram" />
           <EntitySet Name="Users" EntityType="DbModel.User" />
-          <AssociationSet Name="FK_CompanyRequiredSkill_Skill" Association="DbModel.FK_CompanyRequiredSkill_Skill">
-            <End Role="Skill" EntitySet="Skills" />
-            <End Role="CompanyRequiredSkill" EntitySet="CompanyRequiredSkills" />
-          </AssociationSet>
-          <AssociationSet Name="FK_InterviewSchedule_SocietyMember" Association="DbModel.FK_InterviewSchedule_SocietyMember">
-            <End Role="SocietyMember" EntitySet="SocietyMembers" />
-            <End Role="InterviewSchedule" EntitySet="InterviewSchedules" />
-          </AssociationSet>
-          <AssociationSet Name="FK_InterviewSchedule_Student" Association="DbModel.FK_InterviewSchedule_Student">
-            <End Role="Student" EntitySet="Students" />
-            <End Role="InterviewSchedule" EntitySet="InterviewSchedules" />
-          </AssociationSet>
-          <AssociationSet Name="FK_InterviewSchedule_User" Association="DbModel.FK_InterviewSchedule_User">
-            <End Role="User" EntitySet="Users" />
-            <End Role="InterviewSchedule" EntitySet="InterviewSchedules" />
-          </AssociationSet>
-          <AssociationSet Name="FK_CompanyStudentSkill_Skill" Association="DbModel.FK_CompanyStudentSkill_Skill">
-            <End Role="Skill" EntitySet="Skills" />
-            <End Role="StudentSkill" EntitySet="StudentSkills" />
-          </AssociationSet>
-          <AssociationSet Name="FK_SocietyMember_User" Association="DbModel.FK_SocietyMember_User">
-            <End Role="User" EntitySet="Users" />
-            <End Role="SocietyMember" EntitySet="SocietyMembers" />
-          </AssociationSet>
-          <AssociationSet Name="FK_CompanyStudentSkill_Student" Association="DbModel.FK_CompanyStudentSkill_Student">
-            <End Role="Student" EntitySet="Students" />
-            <End Role="StudentSkill" EntitySet="StudentSkills" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Student_User" Association="DbModel.FK_Student_User">
-            <End Role="User" EntitySet="Users" />
-            <End Role="Student" EntitySet="Students" />
-          </AssociationSet>
-          <AssociationSet Name="FK_StudentSelectedCompanies_Student" Association="DbModel.FK_StudentSelectedCompanies_Student">
-            <End Role="Student" EntitySet="Students" />
-            <End Role="StudentSelectedCompany" EntitySet="StudentSelectedCompanies" />
-          </AssociationSet>
-          <EntitySet Name="StudentsFeedbacks" EntityType="DbModel.StudentsFeedback" />
-          <AssociationSet Name="FK_StudentsFeedback_Skill" Association="DbModel.FK_StudentsFeedback_Skill">
-            <End Role="Skill" EntitySet="Skills" />
-            <End Role="StudentsFeedback" EntitySet="StudentsFeedbacks" />
-          </AssociationSet>
-          <AssociationSet Name="FK_StudentsFeedback_Student" Association="DbModel.FK_StudentsFeedback_Student">
-            <End Role="Student" EntitySet="Students" />
-            <End Role="StudentsFeedback" EntitySet="StudentsFeedbacks" />
-          </AssociationSet>
-          <EntitySet Name="Companies" EntityType="DbModel.Company" />
           <AssociationSet Name="FK_Company_Company" Association="DbModel.FK_Company_Company">
             <End Role="Company" EntitySet="Companies" />
             <End Role="Company1" EntitySet="Companies" />
@@ -532,7 +501,75 @@
             <End Role="Company" EntitySet="Companies" />
             <End Role="StudentsFeedback" EntitySet="StudentsFeedbacks" />
           </AssociationSet>
+          <AssociationSet Name="FK_CompanyRequiredSkill_Skill" Association="DbModel.FK_CompanyRequiredSkill_Skill">
+            <End Role="Skill" EntitySet="Skills" />
+            <End Role="CompanyRequiredSkill" EntitySet="CompanyRequiredSkills" />
+          </AssociationSet>
+          <AssociationSet Name="FK_InterviewSchedule_SocietyMember" Association="DbModel.FK_InterviewSchedule_SocietyMember">
+            <End Role="SocietyMember" EntitySet="SocietyMembers" />
+            <End Role="InterviewSchedule" EntitySet="InterviewSchedules" />
+          </AssociationSet>
+          <AssociationSet Name="FK_InterviewSchedule_Student" Association="DbModel.FK_InterviewSchedule_Student">
+            <End Role="Student" EntitySet="Students" />
+            <End Role="InterviewSchedule" EntitySet="InterviewSchedules" />
+          </AssociationSet>
+          <AssociationSet Name="FK_InterviewSchedule_User" Association="DbModel.FK_InterviewSchedule_User">
+            <End Role="User" EntitySet="Users" />
+            <End Role="InterviewSchedule" EntitySet="InterviewSchedules" />
+          </AssociationSet>
+          <AssociationSet Name="FK_CompanyStudentSkill_Skill" Association="DbModel.FK_CompanyStudentSkill_Skill">
+            <End Role="Skill" EntitySet="Skills" />
+            <End Role="StudentSkill" EntitySet="StudentSkills" />
+          </AssociationSet>
+          <AssociationSet Name="FK_StudentsFeedback_Skill" Association="DbModel.FK_StudentsFeedback_Skill">
+            <End Role="Skill" EntitySet="Skills" />
+            <End Role="StudentsFeedback" EntitySet="StudentsFeedbacks" />
+          </AssociationSet>
+          <AssociationSet Name="FK_SocietyMember_User" Association="DbModel.FK_SocietyMember_User">
+            <End Role="User" EntitySet="Users" />
+            <End Role="SocietyMember" EntitySet="SocietyMembers" />
+          </AssociationSet>
+          <AssociationSet Name="FK_CompanyStudentSkill_Student" Association="DbModel.FK_CompanyStudentSkill_Student">
+            <End Role="Student" EntitySet="Students" />
+            <End Role="StudentSkill" EntitySet="StudentSkills" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Student_User" Association="DbModel.FK_Student_User">
+            <End Role="User" EntitySet="Users" />
+            <End Role="Student" EntitySet="Students" />
+          </AssociationSet>
+          <AssociationSet Name="FK_StudentSelectedCompanies_Student" Association="DbModel.FK_StudentSelectedCompanies_Student">
+            <End Role="Student" EntitySet="Students" />
+            <End Role="StudentSelectedCompany" EntitySet="StudentSelectedCompanies" />
+          </AssociationSet>
+          <AssociationSet Name="FK_StudentsFeedback_Student" Association="DbModel.FK_StudentsFeedback_Student">
+            <End Role="Student" EntitySet="Students" />
+            <End Role="StudentsFeedback" EntitySet="StudentsFeedbacks" />
+          </AssociationSet>
         </EntityContainer>
+        <EntityType Name="Company">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="UserId" Type="Int32" />
+          <Property Name="Name" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="NoOfInterviewers" Type="Int32" />
+          <Property Name="Contact1" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Contact2" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="TimeSlot" Type="Int32" />
+          <Property Name="Profile" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Status" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Email" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="rate" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Company1" Relationship="DbModel.FK_Company_Company" FromRole="Company" ToRole="Company1" />
+          <NavigationProperty Name="Company2" Relationship="DbModel.FK_Company_Company" FromRole="Company1" ToRole="Company" />
+          <NavigationProperty Name="User" Relationship="DbModel.FK_Company_User" FromRole="Company" ToRole="User" />
+          <NavigationProperty Name="CompanyRequiredSkills" Relationship="DbModel.FK_CompanyRequiredSkill_Company" FromRole="Company" ToRole="CompanyRequiredSkill" />
+          <NavigationProperty Name="EventFeedbacks" Relationship="DbModel.FK_EventFeedback_Company" FromRole="Company" ToRole="EventFeedback" />
+          <NavigationProperty Name="InterviewSchedules" Relationship="DbModel.FK_InterviewSchedule_Company" FromRole="Company" ToRole="InterviewSchedule" />
+          <NavigationProperty Name="StudentSelectedCompanies" Relationship="DbModel.FK_StudentSelectedCompanies_Company1" FromRole="Company" ToRole="StudentSelectedCompany" />
+          <NavigationProperty Name="StudentsFeedbacks" Relationship="DbModel.FK_StudentsFeedback_Company" FromRole="Company" ToRole="StudentsFeedback" />
+        </EntityType>
         <EntityType Name="CompanyRequiredSkill">
           <Key>
             <PropertyRef Name="Id" />
@@ -541,8 +578,8 @@
           <Property Name="CompanyId" Type="Int32" Nullable="false" />
           <Property Name="Skill_Id" Type="Int32" Nullable="false" />
           <Property Name="NoOfInterviewers" Type="Int32" />
-          <NavigationProperty Name="Skill" Relationship="DbModel.FK_CompanyRequiredSkill_Skill" FromRole="CompanyRequiredSkill" ToRole="Skill" />
           <NavigationProperty Name="Company" Relationship="DbModel.FK_CompanyRequiredSkill_Company" FromRole="CompanyRequiredSkill" ToRole="Company" />
+          <NavigationProperty Name="Skill" Relationship="DbModel.FK_CompanyRequiredSkill_Skill" FromRole="CompanyRequiredSkill" ToRole="Skill" />
         </EntityType>
         <EntityType Name="EventFeedback">
           <Key>
@@ -570,10 +607,18 @@
           <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="AllocatedRoom" Type="String" MaxLength="30" FixedLength="false" Unicode="true" />
           <Property Name="IsShortListed" Type="Boolean" />
+          <NavigationProperty Name="Company" Relationship="DbModel.FK_InterviewSchedule_Company" FromRole="InterviewSchedule" ToRole="Company" />
           <NavigationProperty Name="SocietyMember" Relationship="DbModel.FK_InterviewSchedule_SocietyMember" FromRole="InterviewSchedule" ToRole="SocietyMember" />
           <NavigationProperty Name="Student" Relationship="DbModel.FK_InterviewSchedule_Student" FromRole="InterviewSchedule" ToRole="Student" />
           <NavigationProperty Name="User" Relationship="DbModel.FK_InterviewSchedule_User" FromRole="InterviewSchedule" ToRole="User" />
-          <NavigationProperty Name="Company" Relationship="DbModel.FK_InterviewSchedule_Company" FromRole="InterviewSchedule" ToRole="Company" />
+        </EntityType>
+        <EntityType Name="Pass">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="level2" Type="Int32" />
+          <Property Name="level1" Type="Int32" />
         </EntityType>
         <EntityType Name="Skill">
           <Key>
@@ -617,6 +662,9 @@
           <Property Name="FypTech" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="FypGrad" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="IsCVUploaded" Type="Boolean" />
+          <Property Name="noOfJumps" Type="Int32" />
+          <Property Name="isAllowedJumps" Type="Boolean" />
+          <Property Name="noOfJumpsTaken" Type="Int32" />
           <NavigationProperty Name="InterviewSchedules" Relationship="DbModel.FK_InterviewSchedule_Student" FromRole="Student" ToRole="InterviewSchedule" />
           <NavigationProperty Name="StudentSkills" Relationship="DbModel.FK_CompanyStudentSkill_Student" FromRole="Student" ToRole="StudentSkill" />
           <NavigationProperty Name="User" Relationship="DbModel.FK_Student_User" FromRole="Student" ToRole="User" />
@@ -630,9 +678,22 @@
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Company_Id" Type="Int32" Nullable="false" />
           <Property Name="Student_Id" Type="Int32" Nullable="false" />
-          <Property Name="DummyColumn" Type="Boolean" />
-          <NavigationProperty Name="Student" Relationship="DbModel.FK_StudentSelectedCompanies_Student" FromRole="StudentSelectedCompany" ToRole="Student" />
+          <Property Name="IsJumped" Type="Boolean" />
           <NavigationProperty Name="Company" Relationship="DbModel.FK_StudentSelectedCompanies_Company1" FromRole="StudentSelectedCompany" ToRole="Company" />
+          <NavigationProperty Name="Student" Relationship="DbModel.FK_StudentSelectedCompanies_Student" FromRole="StudentSelectedCompany" ToRole="Student" />
+        </EntityType>
+        <EntityType Name="StudentsFeedback">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="StudentId" Type="Int32" />
+          <Property Name="CompanyId" Type="Int32" />
+          <Property Name="rate" Type="Int32" />
+          <Property Name="Skill_ld" Type="Int32" />
+          <NavigationProperty Name="Company" Relationship="DbModel.FK_StudentsFeedback_Company" FromRole="StudentsFeedback" ToRole="Company" />
+          <NavigationProperty Name="Skill" Relationship="DbModel.FK_StudentsFeedback_Skill" FromRole="StudentsFeedback" ToRole="Skill" />
+          <NavigationProperty Name="Student" Relationship="DbModel.FK_StudentsFeedback_Student" FromRole="StudentsFeedback" ToRole="Student" />
         </EntityType>
         <EntityType Name="StudentSkill">
           <Key>
@@ -663,179 +724,10 @@
           <Property Name="Username" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="Password" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="Role" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Companies" Relationship="DbModel.FK_Company_User" FromRole="User" ToRole="Company" />
           <NavigationProperty Name="InterviewSchedules" Relationship="DbModel.FK_InterviewSchedule_User" FromRole="User" ToRole="InterviewSchedule" />
           <NavigationProperty Name="SocietyMembers" Relationship="DbModel.FK_SocietyMember_User" FromRole="User" ToRole="SocietyMember" />
           <NavigationProperty Name="Students" Relationship="DbModel.FK_Student_User" FromRole="User" ToRole="Student" />
-          <NavigationProperty Name="Companies" Relationship="DbModel.FK_Company_User" FromRole="User" ToRole="Company" />
-        </EntityType>
-        <Association Name="FK_CompanyRequiredSkill_Skill">
-          <End Type="DbModel.Skill" Role="Skill" Multiplicity="1" />
-          <End Type="DbModel.CompanyRequiredSkill" Role="CompanyRequiredSkill" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Skill">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="CompanyRequiredSkill">
-              <PropertyRef Name="Skill_Id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_InterviewSchedule_SocietyMember">
-          <End Type="DbModel.SocietyMember" Role="SocietyMember" Multiplicity="0..1" />
-          <End Type="DbModel.InterviewSchedule" Role="InterviewSchedule" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="SocietyMember">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="InterviewSchedule">
-              <PropertyRef Name="SocietyMemberId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_InterviewSchedule_Student">
-          <End Type="DbModel.Student" Role="Student" Multiplicity="1" />
-          <End Type="DbModel.InterviewSchedule" Role="InterviewSchedule" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Student">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="InterviewSchedule">
-              <PropertyRef Name="StudentId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_InterviewSchedule_User">
-          <End Type="DbModel.User" Role="User" Multiplicity="0..1" />
-          <End Type="DbModel.InterviewSchedule" Role="InterviewSchedule" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="User">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="InterviewSchedule">
-              <PropertyRef Name="AdminId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_CompanyStudentSkill_Skill">
-          <End Type="DbModel.Skill" Role="Skill" Multiplicity="1" />
-          <End Type="DbModel.StudentSkill" Role="StudentSkill" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Skill">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="StudentSkill">
-              <PropertyRef Name="Skill_Id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_SocietyMember_User">
-          <End Type="DbModel.User" Role="User" Multiplicity="0..1" />
-          <End Type="DbModel.SocietyMember" Role="SocietyMember" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="User">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="SocietyMember">
-              <PropertyRef Name="UserId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_CompanyStudentSkill_Student">
-          <End Type="DbModel.Student" Role="Student" Multiplicity="1" />
-          <End Type="DbModel.StudentSkill" Role="StudentSkill" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Student">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="StudentSkill">
-              <PropertyRef Name="StudentId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Student_User">
-          <End Type="DbModel.User" Role="User" Multiplicity="0..1" />
-          <End Type="DbModel.Student" Role="Student" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="User">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Student">
-              <PropertyRef Name="UserId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_StudentSelectedCompanies_Student">
-          <End Type="DbModel.Student" Role="Student" Multiplicity="1" />
-          <End Type="DbModel.StudentSelectedCompany" Role="StudentSelectedCompany" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Student">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="StudentSelectedCompany">
-              <PropertyRef Name="Student_Id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <EntityType Name="StudentsFeedback">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="StudentId" Type="Int32" />
-          <Property Name="CompanyId" Type="Int32" />
-          <Property Name="rate" Type="Int32" />
-          <Property Name="Skill_ld" Type="Int32" />
-          <NavigationProperty Name="Skill" Relationship="DbModel.FK_StudentsFeedback_Skill" FromRole="StudentsFeedback" ToRole="Skill" />
-          <NavigationProperty Name="Student" Relationship="DbModel.FK_StudentsFeedback_Student" FromRole="StudentsFeedback" ToRole="Student" />
-          <NavigationProperty Name="Company" Relationship="DbModel.FK_StudentsFeedback_Company" FromRole="StudentsFeedback" ToRole="Company" />
-        </EntityType>
-        <Association Name="FK_StudentsFeedback_Skill">
-          <End Type="DbModel.Skill" Role="Skill" Multiplicity="0..1" />
-          <End Type="DbModel.StudentsFeedback" Role="StudentsFeedback" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Skill">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="StudentsFeedback">
-              <PropertyRef Name="Skill_ld" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_StudentsFeedback_Student">
-          <End Type="DbModel.Student" Role="Student" Multiplicity="0..1" />
-          <End Type="DbModel.StudentsFeedback" Role="StudentsFeedback" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Student">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="StudentsFeedback">
-              <PropertyRef Name="StudentId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <EntityType Name="Company">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="UserId" Type="Int32" />
-          <Property Name="Name" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
-          <Property Name="NoOfInterviewers" Type="Int32" />
-          <Property Name="Contact1" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
-          <Property Name="Contact2" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
-          <Property Name="TimeSlot" Type="Int32" />
-          <Property Name="Profile" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="Status" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="Email" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
-          <Property Name="rate" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="Company1" Relationship="DbModel.FK_Company_Company" FromRole="Company" ToRole="Company1" />
-          <NavigationProperty Name="Company2" Relationship="DbModel.FK_Company_Company" FromRole="Company1" ToRole="Company" />
-          <NavigationProperty Name="User" Relationship="DbModel.FK_Company_User" FromRole="Company" ToRole="User" />
-          <NavigationProperty Name="CompanyRequiredSkills" Relationship="DbModel.FK_CompanyRequiredSkill_Company" FromRole="Company" ToRole="CompanyRequiredSkill" />
-          <NavigationProperty Name="EventFeedbacks" Relationship="DbModel.FK_EventFeedback_Company" FromRole="Company" ToRole="EventFeedback" />
-          <NavigationProperty Name="InterviewSchedules" Relationship="DbModel.FK_InterviewSchedule_Company" FromRole="Company" ToRole="InterviewSchedule" />
-          <NavigationProperty Name="StudentSelectedCompanies" Relationship="DbModel.FK_StudentSelectedCompanies_Company1" FromRole="Company" ToRole="StudentSelectedCompany" />
-          <NavigationProperty Name="StudentsFeedbacks" Relationship="DbModel.FK_StudentsFeedback_Company" FromRole="Company" ToRole="StudentsFeedback" />
         </EntityType>
         <Association Name="FK_Company_Company">
           <End Type="DbModel.Company" Role="Company" Multiplicity="1" />
@@ -921,12 +813,161 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_CompanyRequiredSkill_Skill">
+          <End Type="DbModel.Skill" Role="Skill" Multiplicity="1" />
+          <End Type="DbModel.CompanyRequiredSkill" Role="CompanyRequiredSkill" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Skill">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="CompanyRequiredSkill">
+              <PropertyRef Name="Skill_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_InterviewSchedule_SocietyMember">
+          <End Type="DbModel.SocietyMember" Role="SocietyMember" Multiplicity="0..1" />
+          <End Type="DbModel.InterviewSchedule" Role="InterviewSchedule" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SocietyMember">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="InterviewSchedule">
+              <PropertyRef Name="SocietyMemberId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_InterviewSchedule_Student">
+          <End Type="DbModel.Student" Role="Student" Multiplicity="1" />
+          <End Type="DbModel.InterviewSchedule" Role="InterviewSchedule" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Student">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="InterviewSchedule">
+              <PropertyRef Name="StudentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_InterviewSchedule_User">
+          <End Type="DbModel.User" Role="User" Multiplicity="0..1" />
+          <End Type="DbModel.InterviewSchedule" Role="InterviewSchedule" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="InterviewSchedule">
+              <PropertyRef Name="AdminId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_CompanyStudentSkill_Skill">
+          <End Type="DbModel.Skill" Role="Skill" Multiplicity="1" />
+          <End Type="DbModel.StudentSkill" Role="StudentSkill" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Skill">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="StudentSkill">
+              <PropertyRef Name="Skill_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_StudentsFeedback_Skill">
+          <End Type="DbModel.Skill" Role="Skill" Multiplicity="0..1" />
+          <End Type="DbModel.StudentsFeedback" Role="StudentsFeedback" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Skill">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="StudentsFeedback">
+              <PropertyRef Name="Skill_ld" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_SocietyMember_User">
+          <End Type="DbModel.User" Role="User" Multiplicity="0..1" />
+          <End Type="DbModel.SocietyMember" Role="SocietyMember" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="SocietyMember">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_CompanyStudentSkill_Student">
+          <End Type="DbModel.Student" Role="Student" Multiplicity="1" />
+          <End Type="DbModel.StudentSkill" Role="StudentSkill" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Student">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="StudentSkill">
+              <PropertyRef Name="StudentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Student_User">
+          <End Type="DbModel.User" Role="User" Multiplicity="0..1" />
+          <End Type="DbModel.Student" Role="Student" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Student">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_StudentSelectedCompanies_Student">
+          <End Type="DbModel.Student" Role="Student" Multiplicity="1" />
+          <End Type="DbModel.StudentSelectedCompany" Role="StudentSelectedCompany" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Student">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="StudentSelectedCompany">
+              <PropertyRef Name="Student_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_StudentsFeedback_Student">
+          <End Type="DbModel.Student" Role="Student" Multiplicity="0..1" />
+          <End Type="DbModel.StudentsFeedback" Role="StudentsFeedback" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Student">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="StudentsFeedback">
+              <PropertyRef Name="StudentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="DbModelStoreContainer" CdmEntityContainer="JobFairMgtEntities">
+          <EntitySetMapping Name="Companies">
+            <EntityTypeMapping TypeName="DbModel.Company">
+              <MappingFragment StoreEntitySet="Company">
+                <ScalarProperty Name="rate" ColumnName="rate" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="Profile" ColumnName="Profile" />
+                <ScalarProperty Name="TimeSlot" ColumnName="TimeSlot" />
+                <ScalarProperty Name="Contact2" ColumnName="Contact2" />
+                <ScalarProperty Name="Contact1" ColumnName="Contact1" />
+                <ScalarProperty Name="NoOfInterviewers" ColumnName="NoOfInterviewers" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="CompanyRequiredSkills">
             <EntityTypeMapping TypeName="DbModel.CompanyRequiredSkill">
               <MappingFragment StoreEntitySet="CompanyRequiredSkill">
@@ -965,6 +1006,15 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="Passes">
+            <EntityTypeMapping TypeName="DbModel.Pass">
+              <MappingFragment StoreEntitySet="Pass">
+                <ScalarProperty Name="level1" ColumnName="level1" />
+                <ScalarProperty Name="level2" ColumnName="level2" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="Skills">
             <EntityTypeMapping TypeName="DbModel.Skill">
               <MappingFragment StoreEntitySet="Skill">
@@ -988,6 +1038,9 @@
           <EntitySetMapping Name="Students">
             <EntityTypeMapping TypeName="DbModel.Student">
               <MappingFragment StoreEntitySet="Student">
+                <ScalarProperty Name="noOfJumpsTaken" ColumnName="noOfJumpsTaken" />
+                <ScalarProperty Name="isAllowedJumps" ColumnName="isAllowedJumps" />
+                <ScalarProperty Name="noOfJumps" ColumnName="noOfJumps" />
                 <ScalarProperty Name="IsCVUploaded" ColumnName="IsCVUploaded" />
                 <ScalarProperty Name="FypGrad" ColumnName="FypGrad" />
                 <ScalarProperty Name="FypTech" ColumnName="FypTech" />
@@ -1009,10 +1062,21 @@
           <EntitySetMapping Name="StudentSelectedCompanies">
             <EntityTypeMapping TypeName="DbModel.StudentSelectedCompany">
               <MappingFragment StoreEntitySet="StudentSelectedCompanies">
-                <ScalarProperty Name="DummyColumn" ColumnName="DummyColumn" />
+                <ScalarProperty Name="IsJumped" ColumnName="IsJumped" />
                 <ScalarProperty Name="Student_Id" ColumnName="Student_Id" />
                 <ScalarProperty Name="Company_Id" ColumnName="Company_Id" />
                 <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="StudentsFeedbacks">
+            <EntityTypeMapping TypeName="DbModel.StudentsFeedback">
+              <MappingFragment StoreEntitySet="StudentsFeedback">
+                <ScalarProperty Name="Skill_ld" ColumnName="Skill_ld" />
+                <ScalarProperty Name="rate" ColumnName="rate" />
+                <ScalarProperty Name="CompanyId" ColumnName="CompanyId" />
+                <ScalarProperty Name="StudentId" ColumnName="StudentId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -1043,34 +1107,6 @@
                 <ScalarProperty Name="Role" ColumnName="Role" />
                 <ScalarProperty Name="Password" ColumnName="Password" />
                 <ScalarProperty Name="Username" ColumnName="Username" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="StudentsFeedbacks">
-            <EntityTypeMapping TypeName="DbModel.StudentsFeedback">
-              <MappingFragment StoreEntitySet="StudentsFeedback">
-                <ScalarProperty Name="Skill_ld" ColumnName="Skill_ld" />
-                <ScalarProperty Name="rate" ColumnName="rate" />
-                <ScalarProperty Name="CompanyId" ColumnName="CompanyId" />
-                <ScalarProperty Name="StudentId" ColumnName="StudentId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Companies">
-            <EntityTypeMapping TypeName="DbModel.Company">
-              <MappingFragment StoreEntitySet="Company">
-                <ScalarProperty Name="rate" ColumnName="rate" />
-                <ScalarProperty Name="Email" ColumnName="Email" />
-                <ScalarProperty Name="Status" ColumnName="Status" />
-                <ScalarProperty Name="Profile" ColumnName="Profile" />
-                <ScalarProperty Name="TimeSlot" ColumnName="TimeSlot" />
-                <ScalarProperty Name="Contact2" ColumnName="Contact2" />
-                <ScalarProperty Name="Contact1" ColumnName="Contact1" />
-                <ScalarProperty Name="NoOfInterviewers" ColumnName="NoOfInterviewers" />
-                <ScalarProperty Name="Name" ColumnName="Name" />
-                <ScalarProperty Name="UserId" ColumnName="UserId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>

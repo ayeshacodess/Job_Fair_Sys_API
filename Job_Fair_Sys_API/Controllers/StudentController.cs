@@ -23,6 +23,31 @@ namespace Job_Fair_Sys_API.Controllers
             _studentRepository = new StudentRepository();
         }
 
+        //[HttpPost]
+        //[Route("api/set/teerPasses")]
+        //public async System.Threading.Tasks.Task<HttpResponseMessage> AddTeerPassesAsync()
+        //{
+        //    var httpRequest = HttpContext.Current.Request;
+
+        //    using (var reader = new StreamReader(await Request.Content.ReadAsStreamAsync()))
+        //    {
+        //        try
+        //        {
+        //            string requestBody = reader.ReadToEnd();
+
+        //            var passes = JsonConvert.DeserializeObject<TeerPassesViewModel>(requestBody);
+        //            var students = _studentRepository.GetStudents();
+        //            var teer1Std = students.Where(x => x.CGPA >= 3.5);
+
+        //            return Request.CreateResponse(HttpStatusCode.OK);
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+        //        }
+        //    }
+        //}
+        
         [HttpPost]
         public HttpResponseMessage Add(Student student)
         {
@@ -108,7 +133,16 @@ namespace Job_Fair_Sys_API.Controllers
                         dbStd.FypTitle = reqData.FypTitle;
                         dbStd.HasFYP = reqData.hasFYP;
                         dbStd.IsCVUploaded = true;
-
+                        if(dbStd.CGPA > 3.5)
+                        {
+                            dbStd.noOfJumps = 6;
+                            dbStd.isAllowedJumps = true;
+                        }
+                        if(dbStd.CGPA >= 3 && dbStd.CGPA <= 3.5)
+                        {
+                            dbStd.noOfJumps = 4;
+                            dbStd.isAllowedJumps = true;
+                        }
                         _studentRepository.DbContext.Entry(dbStd).CurrentValues.SetValues(dbStd);
                         _studentRepository.DbContext.SaveChanges();
 

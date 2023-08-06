@@ -10,6 +10,7 @@ namespace Job_Fair_Sys_API.Models
     {
         public int id { get; set; }
         public Nullable<int> userId { get; set; }
+        public int noOfJumps { get; set; }
         public string name { get; set; }
         public string aridNumber { get; set; }
         public string studyStatus { get; set; }

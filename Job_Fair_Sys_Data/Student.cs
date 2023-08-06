@@ -37,6 +37,9 @@ namespace Job_Fair_Sys_Data
         public string FypTech { get; set; }
         public string FypGrad { get; set; }
         public Nullable<bool> IsCVUploaded { get; set; }
+        public Nullable<int> noOfJumps { get; set; }
+        public Nullable<bool> isAllowedJumps { get; set; }
+        public Nullable<int> noOfJumpsTaken { get; set; }
     
         public virtual ICollection<InterviewSchedule> InterviewSchedules { get; set; }
         public virtual ICollection<StudentSkill> StudentSkills { get; set; }
