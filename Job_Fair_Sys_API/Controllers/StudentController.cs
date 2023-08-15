@@ -143,23 +143,36 @@ namespace Job_Fair_Sys_API.Controllers
                             dbStd.isAllowedJumps = true;
                         }
 
+                        //variable to hold the CV path to save in DB
                         string cvpath = string.Empty;
                         if (httpRequest.Files.Count > 0)
                         {
+                            //if any file attached then get the first one 
                             var studentCv = httpRequest.Files[0];
 
+                            //directory name where we will save the CVs
                             var directoryName = "Student-CVs";
+
+                            //relative directory path
                             var directoryPath = HttpContext.Current.Server.MapPath($"~/{directoryName}");
 
+                            //check is directory exist on given path
                             var isDirExist = Directory.Exists(directoryPath);
-                            if (!isDirExist)
+                            if (!isDirExist) {
+                                //directory does not exist, so create a new one
                                 Directory.CreateDirectory(directoryPath);
+                            }
 
+                            //map the student file with directory
                             var fileNameWithPath = $"~/{directoryName}/{studentCv.FileName}";
 
+                            //set the relative path for student file
                             var filePath = HttpContext.Current.Server.MapPath(fileNameWithPath);
+
+                            //save the file on given path
                             studentCv.SaveAs(filePath);
 
+                            //set the relative path for cv to store in DB
                             cvpath = fileNameWithPath;
                         }
 
