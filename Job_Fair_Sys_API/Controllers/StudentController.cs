@@ -118,10 +118,9 @@ namespace Job_Fair_Sys_API.Controllers
             {
                 try
                 {
-                    string requestBody = reader.ReadToEnd();
+                    var content = httpRequest.Params.Get("body");
+                    var reqData = JsonConvert.DeserializeObject<StudentViewModel>(content);
 
-                    var reqData = JsonConvert.DeserializeObject<StudentViewModel>(requestBody);
-                    Console.WriteLine(reqData);
                     var dbStd = _studentRepository.DbContext.Students.FirstOrDefault(x => x.AridNumber == reqData.aridNumber);
                    
                     if (dbStd != null)
@@ -143,6 +142,29 @@ namespace Job_Fair_Sys_API.Controllers
                             dbStd.noOfJumps = 4;
                             dbStd.isAllowedJumps = true;
                         }
+
+                        string cvpath = string.Empty;
+                        if (httpRequest.Files.Count > 0)
+                        {
+                            var studentCv = httpRequest.Files[0];
+
+                            var directoryName = "Student-CVs";
+                            var directoryPath = HttpContext.Current.Server.MapPath($"~/{directoryName}");
+
+                            var isDirExist = Directory.Exists(directoryPath);
+                            if (!isDirExist)
+                                Directory.CreateDirectory(directoryPath);
+
+                            var fileNameWithPath = $"~/{directoryName}/{studentCv.FileName}";
+
+                            var filePath = HttpContext.Current.Server.MapPath(fileNameWithPath);
+                            studentCv.SaveAs(filePath);
+
+                            cvpath = fileNameWithPath;
+                        }
+
+                        dbStd.cvpath = cvpath;
+
                         _studentRepository.DbContext.Entry(dbStd).CurrentValues.SetValues(dbStd);
                         _studentRepository.DbContext.SaveChanges();
 
@@ -171,18 +193,6 @@ namespace Job_Fair_Sys_API.Controllers
                         }
 
                         _studentRepository.DbContext.SaveChanges();
-
-                        if (HttpContext.Current.Request.Files.Count > 0)
-                        {
-                            var docfiles = new List<string>();
-                            foreach (string file in httpRequest.Files)
-                            {
-                                var postedFile = httpRequest.Files[file];
-                                var filePath = HttpContext.Current.Server.MapPath("~/CV" + postedFile.FileName);
-                                postedFile.SaveAs(filePath);
-                                docfiles.Add(filePath);
-                            }
-                        }
 
                         return Request.CreateResponse(HttpStatusCode.OK, dbStd);
                     }
