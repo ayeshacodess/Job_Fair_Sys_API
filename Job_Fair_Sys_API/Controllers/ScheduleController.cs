@@ -115,8 +115,8 @@ namespace Job_Fair_Sys_API.Controllers
                     var jumpedStudentIds = companySchedule
                         .Where(x => x.IsJumped != null && x.IsJumped == true)
                         .Select(s => new StudentsCGPAModel { studentId = s.StudentId, CGPA = s.Student.CGPA ?? 0.00, isJumped = true });
-                    
-                    var jumpingStudent = new StudentsCGPAModel { studentId = studentId, CGPA = stdCGPA ?? 0.00, isJumped = true }
+
+                    var jumpingStudent = new StudentsCGPAModel { studentId = studentId, CGPA = stdCGPA ?? 0.00, isJumped = true };
 
                     //Main ingredient for student sorting
                     var firstTeerStudents = new List<StudentsCGPAModel>();
@@ -211,9 +211,9 @@ namespace Job_Fair_Sys_API.Controllers
                         _scheduleRepository.AddSchedules(newScheduleList);
                     }
 
-                    s.noOfJumpsTaken = ++jumpsTaken;
+                    // s.noOfJumpsTaken = ++jumpsTaken;
 
-                    _studentRepository.DbContext.Entry(s).CurrentValues.SetValues(s);
+                    //_studentRepository.DbContext.Entry(s).CurrentValues.SetValues(s);
                     _studentRepository.DbContext.SaveChanges();
 
                 }

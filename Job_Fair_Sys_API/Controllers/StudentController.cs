@@ -176,7 +176,7 @@ namespace Job_Fair_Sys_API.Controllers
                             cvpath = fileNameWithPath;
                         }
 
-                        dbStd.cvpath = cvpath;
+                        dbStd.CVPath = cvpath;
 
                         _studentRepository.DbContext.Entry(dbStd).CurrentValues.SetValues(dbStd);
                         _studentRepository.DbContext.SaveChanges();
