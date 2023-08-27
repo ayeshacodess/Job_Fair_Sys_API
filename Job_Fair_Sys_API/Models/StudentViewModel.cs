@@ -87,6 +87,7 @@ namespace Job_Fair_Sys_API.Models
     public class StudentsCGPAModel {
         public int studentId { get; set; }
         public double CGPA { get; set; } = 0.00;
+        public bool isJumped { get; set;} = false;
     }
 
 }
