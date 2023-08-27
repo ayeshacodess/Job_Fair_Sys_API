@@ -33,16 +33,78 @@ namespace Job_Fair_Sys_API.Controllers
         {
             try
             {
-                var std = _studentRepository.GetStudent(studentId);
-                var stdCGPA = std.CGPA;
+                var stdnt = _studentRepository.GetStudent(studentId);
+                var stdCGPA = stdnt.CGPA;
 
-                var companySchedule = _companyRespository.DbContext.InterviewSchedules.Where(x => x.CompanyId == companyId).ToList();
+                var company = _companyRespository.GetCompany(companyId);
+                var compSchedule = _companyRespository.DbContext.InterviewSchedules.Where(x => x.CompanyId == companyId).ToList();
 
                 var stdTeer = Utility.GetStudentPercentile(stdCGPA ?? 0.0);
-                var ifNotJumpedStudent = companySchedule.Any(x => x.IsJumped == null && x.IsJumped == false);
+                var ifNotJumpedStudent = compSchedule.Any(x => x.IsJumped == null && x.IsJumped == false);
                 if (ifNotJumpedStudent)
                 {
+                    _scheduleRepository.DeleteCompanySchedule(companyId);
 
+                    //get company schedule
+                    var companySchedule = _scheduleRepository.GetACompanySchedule(companyId);
+
+                    var allocatedroom = companySchedule.FirstOrDefault()?.AllocatedRoom ?? "lab 10";
+
+                    //get students id(s) who applied/selected the company
+                    var students = _scheduleRepository.GetStudents(companyId);
+                    //get those students ids(and add in list) who selected the company but are not scheduled with the company
+                    var notScheduledStudentsIds = new List<StudentsCGPAModel>();
+
+                    StudentsCGPAModel firstStudent = new StudentsCGPAModel();
+
+                    firstStudent.studentId = studentId;
+                    firstStudent.CGPA = stdCGPA ?? 0.00;
+
+                    foreach (var std in students)
+                    {
+                        notScheduledStudentsIds.Add(new StudentsCGPAModel { studentId = std.Student_Id, CGPA = std.Student.CGPA ?? 0.00 }); 
+                    }
+
+                    notScheduledStudentsIds = notScheduledStudentsIds.OrderBy(x => x.CGPA).ToList();
+                    notScheduledStudentsIds.Insert(0, firstStudent);
+
+                    var companyStartTime = GetCompanyStartTimeByTimeSlot(company.TimeSlot ?? 0);
+                    var companyLeavingTime = GetCompanyEndTimeByTimeSlot(company.TimeSlot ?? 0);
+                   
+                    var newScheduleList = new List<InterviewSchedule>();
+                    var isCompanyBusyForWHoleTime = false;
+
+                    foreach (var studentItem in notScheduledStudentsIds)
+                    {
+                        //If company is busy 
+                        if (isCompanyBusyForWHoleTime)
+                            continue;
+
+                        //create schedule start and end time, based on company and student available start and end time
+                        var scheduleStartTime = new DateTime(companyStartTime.Value.Year, companyStartTime.Value.Month, companyStartTime.Value.Day, companyStartTime.Value.Hour, companyStartTime.Value.Minute, companyStartTime.Value.Second);
+                        var scheduleEndTime = new DateTime(companyStartTime.Value.Year, companyStartTime.Value.Month, companyStartTime.Value.Day, companyStartTime.Value.Hour, companyStartTime.Value.Minute, companyStartTime.Value.Second);
+                        scheduleEndTime = scheduleEndTime.AddMinutes(10);
+
+                        //create a schedule object, as both parties are not busy
+                        var scd = new InterviewSchedule
+                        {
+                            StudentId = studentItem.studentId,
+                            CompanyId = company.Id,
+                            AllocatedRoom = allocatedroom,
+                            StartTime = scheduleStartTime,
+                            EndTime = scheduleEndTime,
+                            Interviewed = false,
+                            Date = DateTime.Now,
+                            TimeDuration = 10,
+                            IsJumped = studentItem.studentId == studentId ? true : false ,
+                        };
+
+                        //assign the company time with the current new schedule end time
+                        companyStartTime = scheduleEndTime;
+
+                        //add schedule with in new list
+                        newScheduleList.Add(scd);    
+                    }
                 }
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
