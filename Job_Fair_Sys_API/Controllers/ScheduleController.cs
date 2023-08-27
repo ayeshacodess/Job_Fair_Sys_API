@@ -7,11 +7,9 @@ using Job_Fair_Sys_Data.Repositories;
 using System.Web.Http;
 using Job_Fair_Sys_Data;
 using Newtonsoft.Json;
-using System;
 using System.Web;
 using Job_Fair_Sys_API.Models;
 using System.IO;
-using Job_Fair_Sys_API.SharedHelper;
 
 namespace Job_Fair_Sys_API.Controllers
 {
@@ -34,189 +32,198 @@ namespace Job_Fair_Sys_API.Controllers
             try
             {
                 var stdnt = _studentRepository.GetStudent(studentId);
-                var stdCGPA = stdnt.CGPA;
+                var stdCGPA = stdnt.CGPA ?? 0.00;
+                int jumpsTaken = stdnt.noOfJumpsTaken ?? 0;
 
+                var allowedJumps = _studentRepository.DbContext.Passes.FirstOrDefault();
+                int allowedJump = (stdCGPA >= 3.5 && stdCGPA < 4.01) ? allowedJumps.level1 ?? 0: allowedJumps.level2 ?? 0; 
+                
                 var company = _companyRespository.GetCompany(companyId);
                 var compSchedule = _companyRespository.DbContext.InterviewSchedules.Where(x => x.CompanyId == companyId).ToList();
 
-                var stdTeer = Utility.GetStudentPercentile(stdCGPA ?? 0.0);
-                var ifNotJumpedStudent = compSchedule.Any(x => x.IsJumped == null && x.IsJumped == false);
+                var ifNotJumpedStudent = compSchedule.All(x => x.IsJumped == null || x.IsJumped == false);
                 
-                if (ifNotJumpedStudent)
+                var newScheduleList = new List<InterviewSchedule>();
+
+                if (allowedJump >= jumpsTaken)
                 {
-                    _scheduleRepository.DeleteCompanySchedule(companyId);
-
-                    //get company schedule
-                    var companySchedule = _scheduleRepository.GetACompanySchedule(companyId);
-
-                    var allocatedroom = companySchedule.FirstOrDefault()?.AllocatedRoom ?? "lab 10";
-
-                    //get students id(s) who applied/selected the company
-                    var students = _scheduleRepository.GetStudents(companyId);
-                    //get those students ids(and add in list) who selected the company but are not scheduled with the company
-                    var studentsToCreateSchedule = new List<StudentsCGPAModel>();
-
-                    StudentsCGPAModel firstStudent = new StudentsCGPAModel();
-
-                    firstStudent.studentId = studentId;
-                    firstStudent.CGPA = stdCGPA ?? 0.00;
-
-                    foreach (var std in students)
+                    if (ifNotJumpedStudent)
                     {
-                        studentsToCreateSchedule.Add(new StudentsCGPAModel { studentId = std.Student_Id, CGPA = std.Student.CGPA ?? 0.00 }); 
-                    }
+                        _scheduleRepository.DeleteCompanySchedule(companyId);
 
-                    studentsToCreateSchedule = studentsToCreateSchedule.OrderBy(x => x.CGPA).ToList();
-                    studentsToCreateSchedule.Insert(0, firstStudent);
+                        //get company schedule
+                        var companySchedule = _scheduleRepository.GetACompanySchedule(companyId);
 
-                    var companyStartTime = GetCompanyStartTimeByTimeSlot(company.TimeSlot ?? 0);
-                    var companyLeavingTime = GetCompanyEndTimeByTimeSlot(company.TimeSlot ?? 0);
-                   
-                    var newScheduleList = new List<InterviewSchedule>();
-                    var isCompanyBusyForWHoleTime = false;
+                        var allocatedroom = companySchedule.FirstOrDefault()?.AllocatedRoom ?? "lab 10";
 
-                    foreach (var studentItem in studentsToCreateSchedule)
-                    {
-                        //If company is busy 
-                        if (companyStartTime == companyLeavingTime)
-                            break;
+                        //get students id(s) who applied/selected the company
+                        var students = _scheduleRepository.GetStudents(companyId);
+                        //get those students ids(and add in list) who selected the company but are not scheduled with the company
+                        var studentsToCreateSchedule = new List<StudentsCGPAModel>();
 
-                        //create schedule start and end time, based on company and student available start and end time
-                        var scheduleStartTime = new DateTime(companyStartTime.Value.Year, companyStartTime.Value.Month, companyStartTime.Value.Day, companyStartTime.Value.Hour, companyStartTime.Value.Minute, companyStartTime.Value.Second);
-                        var scheduleEndTime = new DateTime(companyStartTime.Value.Year, companyStartTime.Value.Month, companyStartTime.Value.Day, companyStartTime.Value.Hour, companyStartTime.Value.Minute, companyStartTime.Value.Second);
-                        scheduleEndTime = scheduleEndTime.AddMinutes(10);
+                        StudentsCGPAModel firstStudent = new StudentsCGPAModel();
 
-                        //create a schedule object, as both parties are not busy
-                        var scd = new InterviewSchedule
+                        firstStudent.studentId = studentId;
+                        firstStudent.CGPA = stdCGPA;
+
+                        foreach (var std in students)
                         {
-                            StudentId = studentItem.studentId,
-                            CompanyId = company.Id,
-                            AllocatedRoom = allocatedroom,
-                            StartTime = scheduleStartTime,
-                            EndTime = scheduleEndTime,
-                            Interviewed = false,
-                            Date = DateTime.Now,
-                            TimeDuration = 10,
-                            IsJumped = studentItem.studentId == studentId ? true : false ,
-                        };
+                            studentsToCreateSchedule.Add(new StudentsCGPAModel { studentId = std.Student_Id, CGPA = std.Student.CGPA ?? 0.00 });
+                        }
 
-                        //assign the company time with the current new schedule end time
-                        companyStartTime = scheduleEndTime;
+                        studentsToCreateSchedule = studentsToCreateSchedule.OrderBy(x => x.CGPA).ToList();
+                        studentsToCreateSchedule.Insert(0, firstStudent);
 
-                        //add schedule with in new list
-                        newScheduleList.Add(scd);    
+                        var companyStartTime = GetCompanyStartTimeByTimeSlot(company.TimeSlot ?? 0);
+                        var companyLeavingTime = GetCompanyEndTimeByTimeSlot(company.TimeSlot ?? 0);
+
+                        var isCompanyBusyForWHoleTime = false;
+
+                        foreach (var studentItem in studentsToCreateSchedule)
+                        {
+                            //If company is busy 
+                            if (companyStartTime == companyLeavingTime)
+                                break;
+
+                            //create schedule start and end time, based on company and student available start and end time
+                            var scheduleStartTime = new DateTime(companyStartTime.Value.Year, companyStartTime.Value.Month, companyStartTime.Value.Day, companyStartTime.Value.Hour, companyStartTime.Value.Minute, companyStartTime.Value.Second);
+                            var scheduleEndTime = new DateTime(companyStartTime.Value.Year, companyStartTime.Value.Month, companyStartTime.Value.Day, companyStartTime.Value.Hour, companyStartTime.Value.Minute, companyStartTime.Value.Second);
+                            scheduleEndTime = scheduleEndTime.AddMinutes(10);
+
+                            //create a schedule object, as both parties are not busy
+                            var scd = new InterviewSchedule
+                            {
+                                StudentId = studentItem.studentId,
+                                CompanyId = company.Id,
+                                AllocatedRoom = allocatedroom,
+                                StartTime = scheduleStartTime,
+                                EndTime = scheduleEndTime,
+                                Interviewed = false,
+                                Date = DateTime.Now,
+                                TimeDuration = 10,
+                                IsJumped = studentItem.studentId == studentId ? true : false,
+                            };
+
+                            //assign the company time with the current new schedule end time
+                            companyStartTime = scheduleEndTime;
+
+                            //add schedule with in new list
+                            newScheduleList.Add(scd);
+                        }
                     }
-                }
-                else 
+                    else
+                    {
+                        //get company schedule
+                        var companySchedule = _scheduleRepository.GetACompanySchedule(companyId);
+
+                        var jumpedStudentIds = companySchedule
+                            .Where(x => x.IsJumped != null && x.IsJumped == true)
+                            .Select(s => new StudentsCGPAModel { studentId = s.StudentId, CGPA = s.Student.CGPA ?? 0.00, isJumped = true });
+
+                        var jumpingStudent = new StudentsCGPAModel { studentId = studentId, CGPA = stdCGPA, isJumped = true };
+
+                        //Main ingredient for student sorting
+                        var firstTeerStudents = new List<StudentsCGPAModel>();
+                        var secondTeerStudents = new List<StudentsCGPAModel>();
+                        var thirdTeerStudents = new List<StudentsCGPAModel>();
+
+                        foreach (var std in jumpedStudentIds)
+                        {
+                            if (std.CGPA >= 3.5 && std.CGPA <= 4.00)
+                            {
+                                firstTeerStudents.Add(std);
+                            }
+                            else if (std.CGPA >= 3 && std.CGPA <= 3.5)
+                            {
+                                secondTeerStudents.Add(std);
+                            }
+                            else if (std.CGPA < 3)
+                            {
+                                thirdTeerStudents.Add(std);
+                            }
+                        }
+
+                        if (jumpingStudent.CGPA >= 3.5 && jumpingStudent.CGPA <= 4.00)
+                        {
+                            firstTeerStudents.Add(jumpingStudent);
+                        }
+                        else if (jumpingStudent.CGPA >= 3 && jumpingStudent.CGPA <= 3.5)
+                        {
+                            secondTeerStudents.Add(jumpingStudent);
+                        }
+                        else if (jumpingStudent.CGPA < 3)
+                        {
+                            thirdTeerStudents.Add(jumpingStudent);
+                        }
+
+                        var finalJumpingStudents = new List<StudentsCGPAModel>();
+                        finalJumpingStudents.AddRange(firstTeerStudents);
+                        finalJumpingStudents.AddRange(secondTeerStudents);
+                        finalJumpingStudents.AddRange(thirdTeerStudents);
+
+                        var allocatedroom = companySchedule.FirstOrDefault()?.AllocatedRoom ?? "lab 10";
+
+                        _scheduleRepository.DeleteCompanySchedule(companyId);
+
+                        //get students id(s) who applied/selected the company
+                        var students = _scheduleRepository.GetStudents(companyId);
+
+                        //get those students ids(and add in list) who selected the company but are not scheduled with the company
+                        var studentsToCreateSchedule = new List<StudentsCGPAModel>();
+
+                        foreach (var std in students)
+                        {
+                            studentsToCreateSchedule.Add(new StudentsCGPAModel { studentId = std.Student_Id, CGPA = std.Student.CGPA ?? 0.00 });
+                        }
+
+                        finalJumpingStudents.AddRange(studentsToCreateSchedule);
+
+                        var companyStartTime = GetCompanyStartTimeByTimeSlot(company.TimeSlot ?? 0);
+                        var companyLeavingTime = GetCompanyEndTimeByTimeSlot(company.TimeSlot ?? 0);
+
+                        foreach (var studentItem in finalJumpingStudents)
+                        {
+                            //If company is busy 
+                            if (companyStartTime == companyLeavingTime)
+                                break;
+
+                            //create schedule start and end time, based on company and student available start and end time
+                            var scheduleStartTime = new DateTime(companyStartTime.Value.Year, companyStartTime.Value.Month, companyStartTime.Value.Day, companyStartTime.Value.Hour, companyStartTime.Value.Minute, companyStartTime.Value.Second);
+                            var scheduleEndTime = new DateTime(companyStartTime.Value.Year, companyStartTime.Value.Month, companyStartTime.Value.Day, companyStartTime.Value.Hour, companyStartTime.Value.Minute, companyStartTime.Value.Second);
+                            scheduleEndTime = scheduleEndTime.AddMinutes(10);
+
+                            //create a schedule object, as both parties are not busy
+                            var scd = new InterviewSchedule
+                            {
+                                StudentId = studentItem.studentId,
+                                CompanyId = company.Id,
+                                AllocatedRoom = allocatedroom,
+                                StartTime = scheduleStartTime,
+                                EndTime = scheduleEndTime,
+                                Interviewed = false,
+                                Date = DateTime.Now,
+                                TimeDuration = 10,
+                                IsJumped = studentItem.studentId == studentId ? true : false,
+                            };
+
+                            //assign the company time with the current new schedule end time
+                            companyStartTime = scheduleEndTime;
+
+                            //add schedule with in new list
+                            newScheduleList.Add(scd);
+                        }
+                    }
+                }            
+
+                if (newScheduleList.Count > 0)
                 {
-                    //get company schedule
-                    var companySchedule = _scheduleRepository.GetACompanySchedule(companyId);
-
-                    var jumpedStudentIds = companySchedule
-                        .Where(x => x.IsJumped != null && x.IsJumped == true)
-                        .Select(s => new StudentsCGPAModel { studentId = s.StudentId, CGPA = s.Student.CGPA ?? 0.00, isJumped = true });
-
-                    var jumpingStudent = new StudentsCGPAModel { studentId = studentId, CGPA = stdCGPA ?? 0.00, isJumped = true };
-
-                    //Main ingredient for student sorting
-                    var firstTeerStudents = new List<StudentsCGPAModel>();
-                    var secondTeerStudents = new List<StudentsCGPAModel>();
-                    var thirdTeerStudents = new List<StudentsCGPAModel>();
-                    
-                    foreach (var std in jumpedStudentIds) {
-                        if (std.CGPA >= 3.5 && std.CGPA <= 4.00) {
-                            firstTeerStudents.Add(std);
-                        }
-                        else if (std.CGPA >= 3 && std.CGPA <= 3.5) {
-                            secondTeerStudents.Add(std); 
-                        }
-                           else if (std.CGPA < 3) {
-                            thirdTeerStudents.Add(std); 
-                        }
-                    }
-
-                    if (jumpingStudent.CGPA >= 3.5 && jumpingStudent.CGPA <= 4.00) 
-                    {
-                        firstTeerStudents.Add(jumpingStudent);
-                    }
-                    else if (jumpingStudent.CGPA >= 3 && jumpingStudent.CGPA <= 3.5) {
-                        secondTeerStudents.Add(jumpingStudent); 
-                    }
-                    else if (jumpingStudent.CGPA < 3) {
-                        thirdTeerStudents.Add(jumpingStudent); 
-                    }
-
-                    var finalJumpingStudents = new List<StudentsCGPAModel>();
-                    finalJumpingStudents.Concat(firstTeerStudents);
-                    finalJumpingStudents.Concat(secondTeerStudents);
-                    finalJumpingStudents.Concat(thirdTeerStudents);
-
-                    var allocatedroom = companySchedule.FirstOrDefault()?.AllocatedRoom ?? "lab 10";
-
-                    _scheduleRepository.DeleteCompanySchedule(companyId);
-
-                    //get students id(s) who applied/selected the company
-                    var students = _scheduleRepository.GetStudents(companyId);
-
-                    //get those students ids(and add in list) who selected the company but are not scheduled with the company
-                    var studentsToCreateSchedule = new List<StudentsCGPAModel>();
-
-                    foreach (var std in students)
-                    {
-                        studentsToCreateSchedule.Add(new StudentsCGPAModel { studentId = std.Student_Id, CGPA = std.Student.CGPA ?? 0.00 }); 
-                    }
-
-                    finalJumpingStudents.Concat(studentsToCreateSchedule);
-
-                    var companyStartTime = GetCompanyStartTimeByTimeSlot(company.TimeSlot ?? 0);
-                    var companyLeavingTime = GetCompanyEndTimeByTimeSlot(company.TimeSlot ?? 0);
-                   
-                    var newScheduleList = new List<InterviewSchedule>();
-                    var isCompanyBusyForWHoleTime = false;
-
-                    foreach (var studentItem in studentsToCreateSchedule)
-                    {
-                        //If company is busy 
-                        if (companyStartTime == companyLeavingTime)
-                            break;
-
-                        //create schedule start and end time, based on company and student available start and end time
-                        var scheduleStartTime = new DateTime(companyStartTime.Value.Year, companyStartTime.Value.Month, companyStartTime.Value.Day, companyStartTime.Value.Hour, companyStartTime.Value.Minute, companyStartTime.Value.Second);
-                        var scheduleEndTime = new DateTime(companyStartTime.Value.Year, companyStartTime.Value.Month, companyStartTime.Value.Day, companyStartTime.Value.Hour, companyStartTime.Value.Minute, companyStartTime.Value.Second);
-                        scheduleEndTime = scheduleEndTime.AddMinutes(10);
-
-                        //create a schedule object, as both parties are not busy
-                        var scd = new InterviewSchedule
-                        {
-                            StudentId = studentItem.studentId,
-                            CompanyId = company.Id,
-                            AllocatedRoom = allocatedroom,
-                            StartTime = scheduleStartTime,
-                            EndTime = scheduleEndTime,
-                            Interviewed = false,
-                            Date = DateTime.Now,
-                            TimeDuration = 10,
-                            IsJumped = studentItem.studentId == studentId ? true : false ,
-                        };
-
-                        //assign the company time with the current new schedule end time
-                        companyStartTime = scheduleEndTime;
-
-                        //add schedule with in new list
-                        newScheduleList.Add(scd);    
-                    }
-
-                    if (newScheduleList.Count > 0)
-                    {
-                        _scheduleRepository.AddSchedules(newScheduleList);
-                    }
-
-                    // s.noOfJumpsTaken = ++jumpsTaken;
-
-                    //_studentRepository.DbContext.Entry(s).CurrentValues.SetValues(s);
-                    _studentRepository.DbContext.SaveChanges();
-
+                    _scheduleRepository.AddSchedules(newScheduleList);
                 }
+
+                stdnt.noOfJumpsTaken = ++jumpsTaken;
+                _studentRepository.DbContext.Entry(stdnt).CurrentValues.SetValues(stdnt);
+                _studentRepository.DbContext.SaveChanges();
+
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
@@ -311,7 +318,7 @@ namespace Job_Fair_Sys_API.Controllers
                 foreach (var item in schedule)
                 {
                     var company = companies.FirstOrDefault(c => c.Id == item.CompanyId);
-                    var student = students.FirstOrDefault(s => s.Id == item.StudentId && s.StudentSelectedCompanies.Any(c => c.Company_Id == company.Id));
+                    var student = students.FirstOrDefault(s => s.Id == item.StudentId);
 
                     if (company == null || student == null)
                         continue;

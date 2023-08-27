@@ -29,7 +29,7 @@ namespace Job_Fair_Sys_API.Controllers
         }
 
         [HttpGet]
-        [Route(" api/notSelectedCompanies")]
+        [Route("api/notSelectedCompanies")]
         public HttpResponseMessage GetNotSelectedStudents(int studentId)
         {
             try
@@ -38,7 +38,7 @@ namespace Job_Fair_Sys_API.Controllers
                 var studentSelectedCompnies = _companyRespository.DbContext.StudentSelectedCompanies.Where(x => x.Student_Id == studentId).ToList();
                 var notSelectedCompanies = companiesWhoseSkillsMatchWithStudent.Where(x => !studentSelectedCompnies.Any(y => y.Company_Id == x.id)).ToList();
                 
-                return Request.CreateResponse(HttpStatusCode.OK);
+                return Request.CreateResponse(HttpStatusCode.OK, notSelectedCompanies);
             }
             catch (Exception ex)
             {
