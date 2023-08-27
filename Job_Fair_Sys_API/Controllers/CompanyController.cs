@@ -28,6 +28,23 @@ namespace Job_Fair_Sys_API.Controllers
             _studentRepository = new StudentRepository();
         }
 
+        [HttpGet]
+        [Route(" api/notSelectedCompanies")]
+        public HttpResponseMessage GetNotSelectedStudents(int studentId)
+        {
+            try
+            {
+                var companiesWhoseSkillsMatchWithStudent = GetCompaniesDataByRole("Student", studentId);
+                var studentSelectedCompnies = _companyRespository.DbContext.StudentSelectedCompanies.Where(x => x.Student_Id == studentId).ToList();
+                var notSelectedCompanies = companiesWhoseSkillsMatchWithStudent.Where(x => !studentSelectedCompnies.Any(y => y.Company_Id == x.id)).ToList();
+                
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
 
         [HttpGet]
         [Route("api/companies")]
