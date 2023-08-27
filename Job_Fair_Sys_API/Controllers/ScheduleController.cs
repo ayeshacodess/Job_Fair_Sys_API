@@ -11,6 +11,7 @@ using System;
 using System.Web;
 using Job_Fair_Sys_API.Models;
 using System.IO;
+using Job_Fair_Sys_API.SharedHelper;
 
 namespace Job_Fair_Sys_API.Controllers
 {
@@ -27,6 +28,31 @@ namespace Job_Fair_Sys_API.Controllers
         }
 
         [HttpGet]
+        [Route("api/schedule/jumpQueue")]
+        public HttpResponseMessage jumpQueue(int companyId, int studentId)
+        {
+            try
+            {
+                var std = _studentRepository.GetStudent(studentId);
+                var stdCGPA = std.CGPA;
+
+                var companySchedule = _companyRespository.DbContext.InterviewSchedules.Where(x => x.CompanyId == companyId).ToList();
+
+                var stdTeer = Utility.GetStudentPercentile(stdCGPA ?? 0.0);
+                var ifNotJumpedStudent = companySchedule.Any(x => x.IsJumped == null && x.IsJumped == false);
+                if (ifNotJumpedStudent)
+                {
+
+                }
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+            [HttpGet]
         [Route("api/schedule/shortlist")]
         public HttpResponseMessage ShortlistStudent(bool isShortList, int studentId, int companyId, int scheduleId)
         {
@@ -170,14 +196,13 @@ namespace Job_Fair_Sys_API.Controllers
                 var company = _companyRespository.GetCompany(companyId);
 
                 var s = _studentRepository.GetStudent(studentId);
-                int numberOfJumps = s.noOfJumps ?? 0;
+                int numberOfJumps = s.noOfJumps ?? 0; //TODO: GET THE NUMBER OF JUMP FROM ALLOWED TABLE
                 int jumpsTaken = s.noOfJumpsTaken ?? 0;
 
                 if (jumpsTaken < numberOfJumps)
                 {
-
-                    if (company != null)
-                    {
+                   if (company != null)
+                   {
                         _scheduleRepository.DeleteCompanySchedule(companyId);
 
                         //get company schedule

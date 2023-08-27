@@ -8,17 +8,22 @@ namespace Job_Fair_Sys_API.Models
 {
     public class RegularAndJumpedViewModel
     {
-        public Boolean isJumped { get; set; }
+        public int id { get; set; }
+        public string companyName { get; set; }
+        public int JumpedStudentsInterviews { get; set; }
+        public int regularInterviews { get; set; }
 
-        //public static RegularAndJumpedViewModel ToViewModel(StudentSelectedCompany s)
-        //{
-        //    var model = new RegularAndJumpedViewModel
-        //    {
-        //        isJumped = s.IsJumped;
-        //    };
+    //    public static RegularAndJumpedViewModel ToViewModel(InterviewSchedule s)
+    //    {
+    //        var model = new RegularAndJumpedViewModel
+    //        {
+    //            companyName = s.Company.Name;
+    //        totalJumpedStudents = s.
+    //        regularInterviews = 
+    //};
 
-        //    return model;
-        //}
+    //        return model;
+    //    }
 
-    }
+}
 }

@@ -7,7 +7,7 @@ namespace Job_Fair_Sys_API.Models
 {
     public class TeerPassesViewModel
     {
-        public int teer1Pass { get; set; }
-        public int teer2Pass { get; set; }
+        public int level1 { get; set; }
+        public int level2 { get; set; }
     }
 }

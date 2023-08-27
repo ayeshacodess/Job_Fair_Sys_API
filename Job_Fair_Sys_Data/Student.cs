@@ -16,10 +16,10 @@ namespace Job_Fair_Sys_Data
     {
         public Student()
         {
-            this.InterviewSchedules = new HashSet<InterviewSchedule>();
             this.StudentSkills = new HashSet<StudentSkill>();
             this.StudentSelectedCompanies = new HashSet<StudentSelectedCompany>();
             this.StudentsFeedbacks = new HashSet<StudentsFeedback>();
+            this.InterviewSchedules = new HashSet<InterviewSchedule>();
         }
     
         public int Id { get; set; }
@@ -41,10 +41,10 @@ namespace Job_Fair_Sys_Data
         public Nullable<bool> isAllowedJumps { get; set; }
         public Nullable<int> noOfJumpsTaken { get; set; }
     
-        public virtual ICollection<InterviewSchedule> InterviewSchedules { get; set; }
         public virtual ICollection<StudentSkill> StudentSkills { get; set; }
         public virtual User User { get; set; }
         public virtual ICollection<StudentSelectedCompany> StudentSelectedCompanies { get; set; }
         public virtual ICollection<StudentsFeedback> StudentsFeedbacks { get; set; }
+        public virtual ICollection<InterviewSchedule> InterviewSchedules { get; set; }
     }
 }

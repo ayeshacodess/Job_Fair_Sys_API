@@ -35,13 +35,29 @@ namespace Job_Fair_Sys_API.Controllers
                     string requestBody = reader.ReadToEnd();
 
                     var passes = JsonConvert.DeserializeObject<TeerPassesViewModel>(requestBody);
-                    var p = new Pass
+
+                    var dbPasses = _passRepository.DbContext.Passes.FirstOrDefault();
+
+                    if (dbPasses == null)
                     {
-                        level1 = passes.teer1Pass,
-                        level2 = passes.teer2Pass,
-                    };
-                    _passRepository.DbContext.Passes.Add(p);
-                    _passRepository.DbContext.SaveChanges();
+
+                        var p = new Pass
+                        {
+                            level1 = passes.level1,
+                            level2 = passes.level2,
+                        };
+                        _passRepository.DbContext.Passes.Add(p);
+                        _passRepository.DbContext.SaveChanges();
+                    }
+                    else
+                    {
+                        dbPasses.level1 = passes.level1;
+                        dbPasses.level2 = passes.level2; 
+
+                        _passRepository.DbContext.Entry(dbPasses).CurrentValues.SetValues(dbPasses);
+                        _passRepository.DbContext.SaveChanges();
+                    }
+                   
                     return Request.CreateResponse(HttpStatusCode.OK);
                 }
                 catch (Exception ex)

@@ -55,6 +55,7 @@
           <Property Name="Description" Type="nvarchar(max)" />
           <Property Name="AllocatedRoom" Type="nvarchar" MaxLength="30" />
           <Property Name="IsShortListed" Type="bit" />
+          <Property Name="IsJumped" Type="bit" />
         </EntityType>
         <EntityType Name="Pass">
           <Key>
@@ -463,7 +464,6 @@
           <EntitySet Name="Companies" EntityType="DbModel.Company" />
           <EntitySet Name="CompanyRequiredSkills" EntityType="DbModel.CompanyRequiredSkill" />
           <EntitySet Name="EventFeedbacks" EntityType="DbModel.EventFeedback" />
-          <EntitySet Name="InterviewSchedules" EntityType="DbModel.InterviewSchedule" />
           <EntitySet Name="Passes" EntityType="DbModel.Pass" />
           <EntitySet Name="Skills" EntityType="DbModel.Skill" />
           <EntitySet Name="SocietyMembers" EntityType="DbModel.SocietyMember" />
@@ -489,10 +489,6 @@
             <End Role="Company" EntitySet="Companies" />
             <End Role="EventFeedback" EntitySet="EventFeedbacks" />
           </AssociationSet>
-          <AssociationSet Name="FK_InterviewSchedule_Company" Association="DbModel.FK_InterviewSchedule_Company">
-            <End Role="Company" EntitySet="Companies" />
-            <End Role="InterviewSchedule" EntitySet="InterviewSchedules" />
-          </AssociationSet>
           <AssociationSet Name="FK_StudentSelectedCompanies_Company1" Association="DbModel.FK_StudentSelectedCompanies_Company1">
             <End Role="Company" EntitySet="Companies" />
             <End Role="StudentSelectedCompany" EntitySet="StudentSelectedCompanies" />
@@ -504,18 +500,6 @@
           <AssociationSet Name="FK_CompanyRequiredSkill_Skill" Association="DbModel.FK_CompanyRequiredSkill_Skill">
             <End Role="Skill" EntitySet="Skills" />
             <End Role="CompanyRequiredSkill" EntitySet="CompanyRequiredSkills" />
-          </AssociationSet>
-          <AssociationSet Name="FK_InterviewSchedule_SocietyMember" Association="DbModel.FK_InterviewSchedule_SocietyMember">
-            <End Role="SocietyMember" EntitySet="SocietyMembers" />
-            <End Role="InterviewSchedule" EntitySet="InterviewSchedules" />
-          </AssociationSet>
-          <AssociationSet Name="FK_InterviewSchedule_Student" Association="DbModel.FK_InterviewSchedule_Student">
-            <End Role="Student" EntitySet="Students" />
-            <End Role="InterviewSchedule" EntitySet="InterviewSchedules" />
-          </AssociationSet>
-          <AssociationSet Name="FK_InterviewSchedule_User" Association="DbModel.FK_InterviewSchedule_User">
-            <End Role="User" EntitySet="Users" />
-            <End Role="InterviewSchedule" EntitySet="InterviewSchedules" />
           </AssociationSet>
           <AssociationSet Name="FK_CompanyStudentSkill_Skill" Association="DbModel.FK_CompanyStudentSkill_Skill">
             <End Role="Skill" EntitySet="Skills" />
@@ -545,6 +529,23 @@
             <End Role="Student" EntitySet="Students" />
             <End Role="StudentsFeedback" EntitySet="StudentsFeedbacks" />
           </AssociationSet>
+          <EntitySet Name="InterviewSchedules" EntityType="DbModel.InterviewSchedule" />
+          <AssociationSet Name="FK_InterviewSchedule_Company" Association="DbModel.FK_InterviewSchedule_Company">
+            <End Role="Company" EntitySet="Companies" />
+            <End Role="InterviewSchedule" EntitySet="InterviewSchedules" />
+          </AssociationSet>
+          <AssociationSet Name="FK_InterviewSchedule_SocietyMember" Association="DbModel.FK_InterviewSchedule_SocietyMember">
+            <End Role="SocietyMember" EntitySet="SocietyMembers" />
+            <End Role="InterviewSchedule" EntitySet="InterviewSchedules" />
+          </AssociationSet>
+          <AssociationSet Name="FK_InterviewSchedule_Student" Association="DbModel.FK_InterviewSchedule_Student">
+            <End Role="Student" EntitySet="Students" />
+            <End Role="InterviewSchedule" EntitySet="InterviewSchedules" />
+          </AssociationSet>
+          <AssociationSet Name="FK_InterviewSchedule_User" Association="DbModel.FK_InterviewSchedule_User">
+            <End Role="User" EntitySet="Users" />
+            <End Role="InterviewSchedule" EntitySet="InterviewSchedules" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="Company">
           <Key>
@@ -566,9 +567,9 @@
           <NavigationProperty Name="User" Relationship="DbModel.FK_Company_User" FromRole="Company" ToRole="User" />
           <NavigationProperty Name="CompanyRequiredSkills" Relationship="DbModel.FK_CompanyRequiredSkill_Company" FromRole="Company" ToRole="CompanyRequiredSkill" />
           <NavigationProperty Name="EventFeedbacks" Relationship="DbModel.FK_EventFeedback_Company" FromRole="Company" ToRole="EventFeedback" />
-          <NavigationProperty Name="InterviewSchedules" Relationship="DbModel.FK_InterviewSchedule_Company" FromRole="Company" ToRole="InterviewSchedule" />
           <NavigationProperty Name="StudentSelectedCompanies" Relationship="DbModel.FK_StudentSelectedCompanies_Company1" FromRole="Company" ToRole="StudentSelectedCompany" />
           <NavigationProperty Name="StudentsFeedbacks" Relationship="DbModel.FK_StudentsFeedback_Company" FromRole="Company" ToRole="StudentsFeedback" />
+          <NavigationProperty Name="InterviewSchedules" Relationship="DbModel.FK_InterviewSchedule_Company" FromRole="Company" ToRole="InterviewSchedule" />
         </EntityType>
         <EntityType Name="CompanyRequiredSkill">
           <Key>
@@ -589,28 +590,6 @@
           <Property Name="Feedback" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="CompanyId" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Company" Relationship="DbModel.FK_EventFeedback_Company" FromRole="EventFeedback" ToRole="Company" />
-        </EntityType>
-        <EntityType Name="InterviewSchedule">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="StudentId" Type="Int32" Nullable="false" />
-          <Property Name="CompanyId" Type="Int32" Nullable="false" />
-          <Property Name="SocietyMemberId" Type="Int32" />
-          <Property Name="AdminId" Type="Int32" />
-          <Property Name="Date" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="TimeDuration" Type="Int32" Nullable="false" />
-          <Property Name="StartTime" Type="DateTime" Precision="3" />
-          <Property Name="EndTime" Type="DateTime" Precision="3" />
-          <Property Name="Interviewed" Type="Boolean" Nullable="false" />
-          <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="AllocatedRoom" Type="String" MaxLength="30" FixedLength="false" Unicode="true" />
-          <Property Name="IsShortListed" Type="Boolean" />
-          <NavigationProperty Name="Company" Relationship="DbModel.FK_InterviewSchedule_Company" FromRole="InterviewSchedule" ToRole="Company" />
-          <NavigationProperty Name="SocietyMember" Relationship="DbModel.FK_InterviewSchedule_SocietyMember" FromRole="InterviewSchedule" ToRole="SocietyMember" />
-          <NavigationProperty Name="Student" Relationship="DbModel.FK_InterviewSchedule_Student" FromRole="InterviewSchedule" ToRole="Student" />
-          <NavigationProperty Name="User" Relationship="DbModel.FK_InterviewSchedule_User" FromRole="InterviewSchedule" ToRole="User" />
         </EntityType>
         <EntityType Name="Pass">
           <Key>
@@ -640,8 +619,8 @@
           <Property Name="Gender" Type="Boolean" Nullable="false" />
           <Property Name="Contact" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="Email" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="InterviewSchedules" Relationship="DbModel.FK_InterviewSchedule_SocietyMember" FromRole="SocietyMember" ToRole="InterviewSchedule" />
           <NavigationProperty Name="User" Relationship="DbModel.FK_SocietyMember_User" FromRole="SocietyMember" ToRole="User" />
+          <NavigationProperty Name="InterviewSchedules" Relationship="DbModel.FK_InterviewSchedule_SocietyMember" FromRole="SocietyMember" ToRole="InterviewSchedule" />
         </EntityType>
         <EntityType Name="Student">
           <Key>
@@ -665,11 +644,11 @@
           <Property Name="noOfJumps" Type="Int32" />
           <Property Name="isAllowedJumps" Type="Boolean" />
           <Property Name="noOfJumpsTaken" Type="Int32" />
-          <NavigationProperty Name="InterviewSchedules" Relationship="DbModel.FK_InterviewSchedule_Student" FromRole="Student" ToRole="InterviewSchedule" />
           <NavigationProperty Name="StudentSkills" Relationship="DbModel.FK_CompanyStudentSkill_Student" FromRole="Student" ToRole="StudentSkill" />
           <NavigationProperty Name="User" Relationship="DbModel.FK_Student_User" FromRole="Student" ToRole="User" />
           <NavigationProperty Name="StudentSelectedCompanies" Relationship="DbModel.FK_StudentSelectedCompanies_Student" FromRole="Student" ToRole="StudentSelectedCompany" />
           <NavigationProperty Name="StudentsFeedbacks" Relationship="DbModel.FK_StudentsFeedback_Student" FromRole="Student" ToRole="StudentsFeedback" />
+          <NavigationProperty Name="InterviewSchedules" Relationship="DbModel.FK_InterviewSchedule_Student" FromRole="Student" ToRole="InterviewSchedule" />
         </EntityType>
         <EntityType Name="StudentSelectedCompany">
           <Key>
@@ -725,9 +704,9 @@
           <Property Name="Password" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="Role" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="Companies" Relationship="DbModel.FK_Company_User" FromRole="User" ToRole="Company" />
-          <NavigationProperty Name="InterviewSchedules" Relationship="DbModel.FK_InterviewSchedule_User" FromRole="User" ToRole="InterviewSchedule" />
           <NavigationProperty Name="SocietyMembers" Relationship="DbModel.FK_SocietyMember_User" FromRole="User" ToRole="SocietyMember" />
           <NavigationProperty Name="Students" Relationship="DbModel.FK_Student_User" FromRole="User" ToRole="Student" />
+          <NavigationProperty Name="InterviewSchedules" Relationship="DbModel.FK_InterviewSchedule_User" FromRole="User" ToRole="InterviewSchedule" />
         </EntityType>
         <Association Name="FK_Company_Company">
           <End Type="DbModel.Company" Role="Company" Multiplicity="1" />
@@ -777,18 +756,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_InterviewSchedule_Company">
-          <End Type="DbModel.Company" Role="Company" Multiplicity="1" />
-          <End Type="DbModel.InterviewSchedule" Role="InterviewSchedule" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Company">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="InterviewSchedule">
-              <PropertyRef Name="CompanyId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_StudentSelectedCompanies_Company1">
           <End Type="DbModel.Company" Role="Company" Multiplicity="1" />
           <End Type="DbModel.StudentSelectedCompany" Role="StudentSelectedCompany" Multiplicity="*" />
@@ -822,42 +789,6 @@
             </Principal>
             <Dependent Role="CompanyRequiredSkill">
               <PropertyRef Name="Skill_Id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_InterviewSchedule_SocietyMember">
-          <End Type="DbModel.SocietyMember" Role="SocietyMember" Multiplicity="0..1" />
-          <End Type="DbModel.InterviewSchedule" Role="InterviewSchedule" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="SocietyMember">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="InterviewSchedule">
-              <PropertyRef Name="SocietyMemberId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_InterviewSchedule_Student">
-          <End Type="DbModel.Student" Role="Student" Multiplicity="1" />
-          <End Type="DbModel.InterviewSchedule" Role="InterviewSchedule" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Student">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="InterviewSchedule">
-              <PropertyRef Name="StudentId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_InterviewSchedule_User">
-          <End Type="DbModel.User" Role="User" Multiplicity="0..1" />
-          <End Type="DbModel.InterviewSchedule" Role="InterviewSchedule" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="User">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="InterviewSchedule">
-              <PropertyRef Name="AdminId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -945,6 +876,77 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="InterviewSchedule">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="StudentId" Type="Int32" Nullable="false" />
+          <Property Name="CompanyId" Type="Int32" Nullable="false" />
+          <Property Name="SocietyMemberId" Type="Int32" />
+          <Property Name="AdminId" Type="Int32" />
+          <Property Name="Date" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="TimeDuration" Type="Int32" Nullable="false" />
+          <Property Name="StartTime" Type="DateTime" Precision="3" />
+          <Property Name="EndTime" Type="DateTime" Precision="3" />
+          <Property Name="Interviewed" Type="Boolean" Nullable="false" />
+          <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="AllocatedRoom" Type="String" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="IsShortListed" Type="Boolean" />
+          <Property Name="IsJumped" Type="Boolean" />
+          <NavigationProperty Name="Company" Relationship="DbModel.FK_InterviewSchedule_Company" FromRole="InterviewSchedule" ToRole="Company" />
+          <NavigationProperty Name="SocietyMember" Relationship="DbModel.FK_InterviewSchedule_SocietyMember" FromRole="InterviewSchedule" ToRole="SocietyMember" />
+          <NavigationProperty Name="Student" Relationship="DbModel.FK_InterviewSchedule_Student" FromRole="InterviewSchedule" ToRole="Student" />
+          <NavigationProperty Name="User" Relationship="DbModel.FK_InterviewSchedule_User" FromRole="InterviewSchedule" ToRole="User" />
+        </EntityType>
+        <Association Name="FK_InterviewSchedule_Company">
+          <End Type="DbModel.Company" Role="Company" Multiplicity="1" />
+          <End Type="DbModel.InterviewSchedule" Role="InterviewSchedule" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Company">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="InterviewSchedule">
+              <PropertyRef Name="CompanyId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_InterviewSchedule_SocietyMember">
+          <End Type="DbModel.SocietyMember" Role="SocietyMember" Multiplicity="0..1" />
+          <End Type="DbModel.InterviewSchedule" Role="InterviewSchedule" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SocietyMember">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="InterviewSchedule">
+              <PropertyRef Name="SocietyMemberId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_InterviewSchedule_Student">
+          <End Type="DbModel.Student" Role="Student" Multiplicity="1" />
+          <End Type="DbModel.InterviewSchedule" Role="InterviewSchedule" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Student">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="InterviewSchedule">
+              <PropertyRef Name="StudentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_InterviewSchedule_User">
+          <End Type="DbModel.User" Role="User" Multiplicity="0..1" />
+          <End Type="DbModel.InterviewSchedule" Role="InterviewSchedule" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="InterviewSchedule">
+              <PropertyRef Name="AdminId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -983,25 +985,6 @@
               <MappingFragment StoreEntitySet="EventFeedback">
                 <ScalarProperty Name="CompanyId" ColumnName="CompanyId" />
                 <ScalarProperty Name="Feedback" ColumnName="Feedback" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="InterviewSchedules">
-            <EntityTypeMapping TypeName="DbModel.InterviewSchedule">
-              <MappingFragment StoreEntitySet="InterviewSchedule">
-                <ScalarProperty Name="IsShortListed" ColumnName="IsShortListed" />
-                <ScalarProperty Name="AllocatedRoom" ColumnName="AllocatedRoom" />
-                <ScalarProperty Name="Description" ColumnName="Description" />
-                <ScalarProperty Name="Interviewed" ColumnName="Interviewed" />
-                <ScalarProperty Name="EndTime" ColumnName="EndTime" />
-                <ScalarProperty Name="StartTime" ColumnName="StartTime" />
-                <ScalarProperty Name="TimeDuration" ColumnName="TimeDuration" />
-                <ScalarProperty Name="Date" ColumnName="Date" />
-                <ScalarProperty Name="AdminId" ColumnName="AdminId" />
-                <ScalarProperty Name="SocietyMemberId" ColumnName="SocietyMemberId" />
-                <ScalarProperty Name="CompanyId" ColumnName="CompanyId" />
-                <ScalarProperty Name="StudentId" ColumnName="StudentId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -1107,6 +1090,26 @@
                 <ScalarProperty Name="Role" ColumnName="Role" />
                 <ScalarProperty Name="Password" ColumnName="Password" />
                 <ScalarProperty Name="Username" ColumnName="Username" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="InterviewSchedules">
+            <EntityTypeMapping TypeName="DbModel.InterviewSchedule">
+              <MappingFragment StoreEntitySet="InterviewSchedule">
+                <ScalarProperty Name="IsJumped" ColumnName="IsJumped" />
+                <ScalarProperty Name="IsShortListed" ColumnName="IsShortListed" />
+                <ScalarProperty Name="AllocatedRoom" ColumnName="AllocatedRoom" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="Interviewed" ColumnName="Interviewed" />
+                <ScalarProperty Name="EndTime" ColumnName="EndTime" />
+                <ScalarProperty Name="StartTime" ColumnName="StartTime" />
+                <ScalarProperty Name="TimeDuration" ColumnName="TimeDuration" />
+                <ScalarProperty Name="Date" ColumnName="Date" />
+                <ScalarProperty Name="AdminId" ColumnName="AdminId" />
+                <ScalarProperty Name="SocietyMemberId" ColumnName="SocietyMemberId" />
+                <ScalarProperty Name="CompanyId" ColumnName="CompanyId" />
+                <ScalarProperty Name="StudentId" ColumnName="StudentId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
