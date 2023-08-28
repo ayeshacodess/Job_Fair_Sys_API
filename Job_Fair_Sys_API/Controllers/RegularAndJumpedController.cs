@@ -55,7 +55,7 @@ namespace Job_Fair_Sys_API.Controllers
             try
             {
 
-                var companySchedule = _companyRespository.DbContext.InterviewSchedules.Where(x => x.CompanyId == companyId && x.IsJumped == null).ToList();
+                var companySchedule = _companyRespository.DbContext.InterviewSchedules.Where(x => x.CompanyId == companyId && (x.IsJumped == null || x.IsJumped == false)).ToList();
                 var regularStudents = new List<StudentViewModel>();
                 foreach (var st in companySchedule)
                 {
@@ -79,7 +79,7 @@ namespace Job_Fair_Sys_API.Controllers
             try
             {
 
-                var companySchedule = _companyRespository.DbContext.InterviewSchedules.Where(x => x.CompanyId == companyId && x.IsJumped != null).ToList();
+                var companySchedule = _companyRespository.DbContext.InterviewSchedules.Where(x => x.CompanyId == companyId && x.IsJumped != null && x.IsJumped == true).ToList();
                 var jumpedStudents = new List<StudentViewModel>();
                 foreach (var st in companySchedule)
                 {
