@@ -145,15 +145,18 @@ namespace Job_Fair_Sys_API.Controllers
 
                         if (jumpingStudent.CGPA >= 3.5 && jumpingStudent.CGPA <= 4.00)
                         {
+                            if(!firstTeerStudents.Any(x =>x.studentId == jumpingStudent.studentId))
                             firstTeerStudents.Add(jumpingStudent);
                         }
                         else if (jumpingStudent.CGPA >= 3 && jumpingStudent.CGPA <= 3.5)
                         {
-                            secondTeerStudents.Add(jumpingStudent);
+                            if (!secondTeerStudents.Any(x => x.studentId == jumpingStudent.studentId))
+                                secondTeerStudents.Add(jumpingStudent);
                         }
                         else if (jumpingStudent.CGPA < 3)
                         {
-                            thirdTeerStudents.Add(jumpingStudent);
+                            if (!thirdTeerStudents.Any(x => x.studentId == jumpingStudent.studentId))
+                                thirdTeerStudents.Add(jumpingStudent);
                         }
 
                         var finalJumpingStudents = new List<StudentsCGPAModel>();
