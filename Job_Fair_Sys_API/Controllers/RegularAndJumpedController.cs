@@ -1,4 +1,4 @@
-﻿using Job_Fair_Sys_API.Models;
+using Job_Fair_Sys_API.Models;
 using Job_Fair_Sys_Data;
 using Job_Fair_Sys_Data.Repositories;
 using System;
@@ -29,8 +29,8 @@ namespace Job_Fair_Sys_API.Controllers
                 var companiesAndRegularAndJumpedStudents = new List<RegularAndJumpedViewModel>();
                 foreach (var company in companies)
                 {
-                    var jumpedStudentsInCompany = _companyRespository.DbContext.InterviewSchedules.Count(x => x.CompanyId == company.Id &&  x.IsJumped != null && x.IsJumped == true) ;
-                    var regularStudentsInCompany = _companyRespository.DbContext.InterviewSchedules.Count(x => x.CompanyId == company.Id && x.IsJumped == null && x.IsJumped == false);
+                    var jumpedStudentsInCompany = _companyRespository.DbContext.InterviewSchedules.Count(x => x.CompanyId == company.Id && x.IsJumped != null && x.IsJumped == true);
+                    var regularStudentsInCompany = _companyRespository.DbContext.InterviewSchedules.Count(x => x.CompanyId == company.Id && (x.IsJumped == null || x.IsJumped == false));
                     var obj = new RegularAndJumpedViewModel
                     {
                         id = company.Id,
