@@ -16,7 +16,7 @@ namespace Job_Fair_Sys_API.Controllers
         public decimal Average { get; set; }
     }
 
-    public class StudentPercentageForCompanyViewModel
+    public class StudentSkillCountModel
     {
         public int Skill_Id { get; set; }
         public string TechnologyName { get; set; }
@@ -68,7 +68,13 @@ namespace Job_Fair_Sys_API.Controllers
                     var techName = item.FirstOrDefault().Skill.Technology;
                     var skilId = item.Key ?? 0;
 
-                    avgOfSkills.Add(new SkillAvgFeedbackViewModel { Average = avgS, TechnologyName = techName, Skill_Id = skilId });
+                    var skillObj = new SkillAvgFeedbackViewModel { 
+                        Average = avgS, 
+                        TechnologyName = techName, 
+                        Skill_Id = skilId
+                    };
+
+                    avgOfSkills.Add(skillObj);
                 }
 
                 avgOfSkills = avgOfSkills.OrderBy(x => x.Skill_Id).ToList();
@@ -82,7 +88,7 @@ namespace Job_Fair_Sys_API.Controllers
         }
 
         [HttpGet]
-        [Route("api/StudentPercentageForCompany")]
+        [Route("api/StudentSkillCountModel")]
         public HttpResponseMessage StudentPercentageInASkill(int? companyId)
         {
             try
@@ -100,7 +106,7 @@ namespace Job_Fair_Sys_API.Controllers
 
                 var feedbacks = queriedFeedback.GroupBy(x => x.Skill_ld).ToList();
 
-                var response = new List<StudentPercentageForCompanyViewModel>();
+                var response = new List<StudentSkillCountModel>();
 
                 //foreach
                 foreach (var item in feedbacks)
@@ -121,7 +127,7 @@ namespace Job_Fair_Sys_API.Controllers
                     var techName = item.FirstOrDefault().Skill.Technology;
                     var skilId = item.Key ?? 0;
 
-                    var skilModel = new StudentPercentageForCompanyViewModel
+                    var skilModel = new StudentSkillCountModel
                     {
                         Skill_Id = skilId,
                         TechnologyName = techName,
