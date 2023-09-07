@@ -235,7 +235,7 @@ namespace Job_Fair_Sys_API.Controllers
             }
         }
 
-            [HttpGet]
+        [HttpGet]
         [Route("api/schedule/shortlist")]
         public HttpResponseMessage ShortlistStudent(bool isShortList, int studentId, int companyId, int scheduleId)
         {
@@ -333,7 +333,7 @@ namespace Job_Fair_Sys_API.Controllers
                             id = item.Id,
                             percentile = SharedHelper.Utility.GetStudentPercentile(student.CGPA ?? 0),
                             studentId = student.Id,
-
+                            myNumberInQueue = getNumberInQueue(item.CompanyId, item.StudentId),
                             studentName = student.Name,
                             aridNumber = student.AridNumber,
                             companyId = company.Id,
@@ -361,6 +361,8 @@ namespace Job_Fair_Sys_API.Controllers
                         models.Add(model);
                     }
                 }
+                
+                models.Sort((x, y) => x.startTime.Value.TimeOfDay.CompareTo(y.startTime.Value.TimeOfDay));
 
                 return Request.CreateResponse(HttpStatusCode.OK, models);
             }
@@ -829,6 +831,14 @@ namespace Job_Fair_Sys_API.Controllers
             {
                 return "---";
             }
+        }
+        private int getNumberInQueue(int companyId, int studentId)
+        {
+            var companySchedule = _scheduleRepository.GetACompanySchedule(companyId);
+            companySchedule.Sort((x, y) => x.StartTime.Value.TimeOfDay.CompareTo(y.StartTime.Value.TimeOfDay));
+            var studentIndex = companySchedule.FindIndex(x => x.StudentId == studentId);
+            ++studentIndex;
+            return studentIndex;
         }
     }
 }

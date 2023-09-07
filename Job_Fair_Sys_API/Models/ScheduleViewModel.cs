@@ -22,5 +22,6 @@ namespace Job_Fair_Sys_API.Models
         public bool isShortListed { get; set; } = false;
         public string percentile { get; set; }
         public double cgpa { get; set; } = 0.0;
+        public int myNumberInQueue { get; set; }
     }
 }
